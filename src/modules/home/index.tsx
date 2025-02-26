@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { AppSidebar } from "./components/app-sidebar"
+import { AppSidebar } from "./components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,37 +8,51 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { useSearchParams } from "next/navigation"
-import Slider from "./modules/slider"
+} from "@/components/ui/sidebar";
+import { useSearchParams } from "next/navigation";
+import Slider from "./modules/slider";
+import Blog from "./modules/blog";
+import Review from "./modules/reviews";
+import TimeKeeping from "./modules/timekeeping";
 
 export default function HomeClient() {
-
-  const param = useSearchParams()
+  const param = useSearchParams();
 
   const renderTab = (tab: string) => {
     switch (tab) {
       case "slider":
-        return <Slider />
+        return <Slider />;
+      case "blog":
+        return <Blog />;
+      case "reviews":
+        return <Review />;
+      case "timekeeping":
+        return <TimeKeeping />;
       default:
-        return <Slider />
+        return <Slider />;
     }
-  }
+  };
 
   const renderBreadcrumb = (tab: string) => {
     switch (tab) {
       case "slider":
-        return "Slider"
+        return "Slider";
+      case "blog":
+        return "Bài Viết";
+      case "reviews":
+        return "Đánh giá";
+      case "timekeeping":
+        return "Chấm công";
       default:
-        return "Slider"
+        return "Slider";
     }
-  }
+  };
 
   return (
     <SidebarProvider>
@@ -58,7 +72,9 @@ export default function HomeClient() {
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>
-                    <span className="text-[16px]">{renderBreadcrumb(param.get('tab') || 'product')}</span>
+                    <span className="text-[16px]">
+                      {renderBreadcrumb(param.get("tab") || "slider")}
+                    </span>
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -67,9 +83,9 @@ export default function HomeClient() {
         </header>
         <div className="w-full h-[1.5px] bg-black opacity-10"></div>
         <div className="flex flex-1 flex-col">
-          {renderTab(param.get('tab') || 'product')}
+          {renderTab(param.get("tab") || "slider")}
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
