@@ -181,9 +181,7 @@ export function ModalCreateBlog() {
     await BlogService.createBlog(body);
     setIsLoading(false);
 
-    console.log("check created content", body);
-
-    // window.location.href = "/?tab=blog";
+    window.location.href = "/?tab=blog";
   };
 
   return (
