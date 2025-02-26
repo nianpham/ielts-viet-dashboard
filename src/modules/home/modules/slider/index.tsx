@@ -33,7 +33,6 @@ export default function Slider() {
   const init = async () => {
     try {
       const res = await SliderService.getAll();
-
       if (Array.isArray(res) && res.length > 0) {
         setData(res);
         setTotalPage(Math.ceil(res.length / COUNT));
@@ -55,7 +54,7 @@ export default function Slider() {
     init();
   }, []);
 
-  useEffect(() => {}, [totalPage, isLoading, currenData, currenPage]);
+  useEffect(() => { }, [totalPage, isLoading, currenData, currenPage]);
 
   return (
     <section className="p-4">
@@ -66,19 +65,20 @@ export default function Slider() {
               <span className="text-gray-800 text-[20px] font-bold">
                 SLIDER TRANG CHỦ ({data?.length})
               </span>
-
               <div className="flex flex-wrap">
                 {data?.map((item: any, index: any) => {
-                  <div key={index} className="w-52 h-52">
-                    <div>hahahah</div>
-                    <Image
-                      src={item?.image}
-                      alt="imgaaa"
-                      width={1000}
-                      height={1000}
-                      className="w-full h-full"
-                    />
-                  </div>;
+                  return (
+                    <div key={index} className="w-52 h-52">
+                      <div>hahahah</div>
+                      <Image
+                        src={item?.image}
+                        alt="imgaaa"
+                        width={1000}
+                        height={1000}
+                        className="w-full h-full"
+                      />
+                    </div>
+                  )
                 })}
               </div>
             </h5>
