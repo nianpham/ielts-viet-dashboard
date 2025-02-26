@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-import { HELPER } from "@/utils/helper";
 import { IMAGES } from "@/utils/image";
+import { SliderService } from "@/services/sliders";
+import Image from "next/image";
 
 export default function Slider() {
-  const COUNT = 6;
+  const COUNT = 12;
 
   const [data, setData] = useState([] as any);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -30,7 +30,26 @@ export default function Slider() {
     setCurrenData(data.slice(0, COUNT));
   };
 
-  const init = async () => {};
+  const init = async () => {
+    try {
+      const res = await SliderService.getAll();
+
+      if (Array.isArray(res) && res.length > 0) {
+        setData(res);
+        setTotalPage(Math.ceil(res.length / COUNT));
+        setCurrenPage(1);
+        setCurrenData(res.slice(0, COUNT));
+        setIsLoading(false);
+      } else {
+        setData([]);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching blog data:", error);
+      setData([]);
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     init();
@@ -47,80 +66,47 @@ export default function Slider() {
               <span className="text-gray-800 text-[20px] font-bold">
                 SLIDER TRANG CHỦ ({data?.length})
               </span>
+
+              <div className="flex flex-wrap">
+                {data?.map((item: any, index: any) => {
+                  <div key={index} className="w-52 h-52">
+                    <div>hahahah</div>
+                    <Image
+                      src={item?.image}
+                      alt="imgaaa"
+                      width={1000}
+                      height={1000}
+                      className="w-full h-full"
+                    />
+                  </div>;
+                })}
+              </div>
             </h5>
           </div>
         </div>
-        <div className="overflow-x-auto mt-4">alabatrap</div>
-        {/* {isLoading && data.length > 0 ? (
+        {isLoading && data.length > 0 ? (
           <div className="w-full flex justify-center items-center pt-60">
             <Loader className="animate-spin" size={48} />
           </div>
         ) : (
           <nav
-            className="flex flex-col items-start justify-center mt-4 p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
+            className="flex flex-col items-start justify-center mt-4 space-y-3 md:flex-row md:items-center md:space-y-0"
             aria-label="Table navigation"
           >
             {data.length > 0 ? (
-              <ul className="inline-flex items-stretch -space-x-px">
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Previous</span>
-                    <svg
-                      className="w-5 h-5"
-                      aria-hidden="true"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </a>
-                </li>
-                {Array.from({ length: totalPage }, (_, i) => i + 1)?.map(
-                  (item: any, index: any) => {
-                    return (
-                      <li key={index} onClick={() => selectPage(item)}>
-                        <a
-                          href="#"
-                          className={`${
-                            item === currenPage ? "bg-orange-100" : "bg-white"
-                          } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    );
-                  }
-                )}
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Next</span>
-                    <svg
-                      className="w-5 h-5"
-                      aria-hidden="true"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </a>
-                </li>
-              </ul>
+              <div className="grid grid-cols-4">
+                {data?.map((item: any, index: any) => {
+                  <div key={index} className="w-52 h-52">
+                    <Image
+                      src={item?.image}
+                      alt="imgaaa"
+                      width={1000}
+                      height={1000}
+                      className="w-full h-full"
+                    />
+                  </div>;
+                })}
+              </div>
             ) : (
               <div className="mt-40">
                 <Image
@@ -132,7 +118,7 @@ export default function Slider() {
               </div>
             )}
           </nav>
-        )} */}
+        )}
       </div>
     </section>
   );
