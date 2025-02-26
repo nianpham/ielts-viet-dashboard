@@ -8,21 +8,26 @@ import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 // import { BlogService } from "@/services/blog";
 import { HELPER } from "@/utils/helper";
+import { ReviewService } from "@/services/review";
+import { IMAGES } from "@/utils/image";
+import { ModalUpdateReview } from "./components/modal.update";
+import { ModalCreateReviews } from "./components/modal.create";
 
-export interface Blog {
+export interface Review {
   _id: string;
-  title: string;
-  content: string;
-  tag: string;
-  author: string;
-  thumbnail: string;
   created_at: string;
+  comment: string;
+  name: string;
+  overall: number;
+  rating: number;
+  school: string;
+  avatar: string;
 }
 
 export default function Review() {
   const COUNT = 6;
 
-  const [data, setData] = useState<Blog[]>([] as any);
+  const [data, setData] = useState<Review[]>([] as any);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [currenPage, setCurrenPage] = useState<any>(1 as any);
@@ -47,30 +52,30 @@ export default function Review() {
     }
   };
 
-  // const init = async () => {
-  //   try {
-  //     const res = await BlogService.getAll();
+  const init = async () => {
+    try {
+      const res = await ReviewService.getAll();
 
-  //     if (Array.isArray(res) && res.length > 0) {
-  //       setData(res);
-  //       setTotalPage(Math.ceil(res.length / COUNT));
-  //       setCurrenPage(1);
-  //       setCurrenData(res.slice(0, COUNT));
-  //       setIsLoading(false);
-  //     } else {
-  //       setData([]);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching blog data:", error);
-  //     setData([]);
-  //     setIsLoading(false);
-  //   }
-  // };
+      if (Array.isArray(res) && res.length > 0) {
+        setData(res);
+        setTotalPage(Math.ceil(res.length / COUNT));
+        setCurrenPage(1);
+        setCurrenData(res.slice(0, COUNT));
+        setIsLoading(false);
+      } else {
+        setData([]);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching review data:", error);
+      setData([]);
+      setIsLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   init();
-  // }, []);
+  useEffect(() => {
+    init();
+  }, []);
 
   useEffect(() => {}, [totalPage, isLoading, currenData, currenPage]);
 
@@ -86,7 +91,7 @@ export default function Review() {
             </h5>
           </div>
           <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-            {/* <ModalCreateBlog /> */}
+            <ModalCreateReviews />
           </div>
         </div>
         <div className="overflow-x-auto mt-4">
@@ -94,19 +99,19 @@ export default function Review() {
             <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="w-64 px-4 py-3">
-                  TIÊU ĐỀ
+                  HỌC VIÊN
                 </th>
                 <th scope="col" className="w-32 px-4 py-3">
-                  TAG
+                  ĐÁNH GIÁ
                 </th>
                 <th scope="col" className="w-80 px-4 py-3">
                   NỘI DUNG
                 </th>
                 <th scope="col" className="w-32 px-4 py-3">
-                  TÁC GIẢ
+                  OVERALL
                 </th>
                 <th scope="col" className="w-24 px-4 py-3">
-                  NGÀY
+                  NGÀY ĐĂNG
                 </th>
                 <th scope="col" className="w-24 px-4 py-3">
                   CHI TIẾT
@@ -124,38 +129,34 @@ export default function Review() {
                   >
                     <td className="w-64 px-4 py-2 grid grid-cols-12 gap-3 items-center">
                       <Image
-                        src={item?.thumbnail}
+                        src={item?.avatar}
                         alt="img"
-                        className="w-auto h-20 mr-3 rounded-md col-span-6"
-                        width={100}
-                        height={0}
+                        className="w-auto h-20 mr-3 col-span-6 rounded-full"
+                        width={1000}
+                        height={1000}
                       />
                       <span className="col-span-6 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {item?.title}
+                        {item?.name}
                       </span>
                     </td>
-                    <td className="w-32 px-4 py-2">
-                      <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {/* {HELPER.renderTag(item?.tag)} */}
-                      </span>
-                    </td>
-                    <td className="w-80 px-4 py-2">
+                    <td className="pl-10 w-32 px-4 py-2">
                       <span className="text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {/* <div
-                          dangerouslySetInnerHTML={{
-                            __html: HELPER.sanitizeContent(item?.content),
-                          }}
-                        /> */}
+                        {item?.rating}
                       </span>
                     </td>
-                    <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {item?.author}
+                    <td className="w-40 px-4 py-2">
+                      <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300 line-clamp-3">
+                        {item?.comment}
+                      </span>
+                    </td>
+                    <td className="pl-10 w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      {item?.overall}
                     </td>
                     <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {/* {HELPER.formatDate(item?.created_at)} */}
+                      {HELPER.formatDate(item?.created_at)}
                     </td>
                     <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {/* <ModalUpdateBlog data={item} /> */}
+                      <ModalUpdateReview data={item} />
                     </td>
                   </tr>
                 );

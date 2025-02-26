@@ -13,11 +13,11 @@ export const API = {
   DELETE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   GET_BLOG_BY_ID: `${BASE_URL}/ielts-viet/blog`,
   //REVIEWS
-  GET_ALL_REVIEW: `${BASE_URL}/slider`,
-  CREATE_REVIEW: `${BASE_URL}/slider`,
-  UPDATE_REVIEW: `${BASE_URL}/slider`,
-  DELETE_REVIEW: `${BASE_URL}/slider`,
-  GET_REVIEW_BY_ID: `${BASE_URL}/slider`,
+  GET_ALL_REVIEW: `${BASE_URL}/ielts-viet/review/`,
+  CREATE_REVIEW: `${BASE_URL}/ielts-viet/review/`,
+  UPDATE_REVIEW: `${BASE_URL}/ielts-viet/review`,
+  DELETE_REVIEW: `${BASE_URL}/ielts-viet/review`,
+  GET_REVIEW_BY_ID: `${BASE_URL}/ielts-viet/review`,
   //TIMEKEEPING
   GET_ALL_TEACHER: `${BASE_URL}/slider`,
 };
