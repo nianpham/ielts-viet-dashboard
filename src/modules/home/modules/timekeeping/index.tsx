@@ -2,27 +2,64 @@
 "use client";
 
 import Image from "next/image";
-// import { ModalCreateBlog } from "./modal.create";
-// import { ModalUpdateBlog } from "./modal.update";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-// import { BlogService } from "@/services/blog";
+import { TimekeepingService } from "@/services/timekeeping";
 import { HELPER } from "@/utils/helper";
+import { ModalStatisticDay } from "./components/modal.day";
+import { ModalStatisticMonth } from "./components/modal.month";
+import { ModalCreateTeacher } from "./components/modal.create";
+import { ModalUpdateTeacher } from "./components/modal.update";
 
-export interface Blog {
+export interface Teacher {
   _id: string;
-  title: string;
-  content: string;
-  tag: string;
-  author: string;
-  thumbnail: string;
-  created_at: string;
+  teacher_name: string;
+  teacher_avatar: string;
+  role: string;
+  login_code: string;
+  latest_datetime_check_in: string;
+  latest_datetime_check_out: string;
+  latest_status: string;
+}
+export interface StatDay {
+  _id: string;
+  teacher_name: string;
+  teacher_avatar: string;
+  role: string;
+  latest_datetime_check_in: string;
+  latest_datetime_check_out: string;
+  timekeeping: [
+    {
+      _id: string;
+      account_id: string;
+      check_in: string;
+      check_out: string;
+      status: string;
+      created_at: string;
+    }
+  ];
+}
+
+export interface StatMonth {
+  _id: string;
+  teacher_name: string;
+  teacher_avatar: string;
+  role: string;
+  latest_datetime_check_in: string;
+  latest_datetime_check_out: string;
+  timekeeping: {
+    total_shift: number;
+    enough_shift: number;
+    error_shift: number;
+  };
 }
 
 export default function Timekeeping() {
   const COUNT = 6;
 
-  const [data, setData] = useState<Blog[]>([] as any);
+  const [data, setData] = useState<Teacher[]>([] as any);
+  const [dataStatDay, setDataStatDay] = useState<StatDay[]>([] as any);
+  const [dataStatMonth, setDataStatMonth] = useState<StatMonth[]>([] as any);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [currenPage, setCurrenPage] = useState<any>(1 as any);
@@ -47,30 +84,46 @@ export default function Timekeeping() {
     }
   };
 
-  // const init = async () => {
-  //   try {
-  //     const res = await BlogService.getAll();
+  const getStatDayById = (teacherId: string) => {
+    return dataStatDay.find((stat) => stat._id === teacherId);
+  };
 
-  //     if (Array.isArray(res) && res.length > 0) {
-  //       setData(res);
-  //       setTotalPage(Math.ceil(res.length / COUNT));
-  //       setCurrenPage(1);
-  //       setCurrenData(res.slice(0, COUNT));
-  //       setIsLoading(false);
-  //     } else {
-  //       setData([]);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching blog data:", error);
-  //     setData([]);
-  //     setIsLoading(false);
-  //   }
-  // };
+  const getStatMonthById = (teacherId: string) => {
+    return dataStatMonth.find((stat) => stat._id === teacherId);
+  };
 
-  // useEffect(() => {
-  //   init();
-  // }, []);
+  const init = async () => {
+    try {
+      const currentMonth = new Date().getMonth() + 1;
+
+      const res = await TimekeepingService.getAll();
+      const statDay = await TimekeepingService.getStatisticByDay();
+      const statMonth = await TimekeepingService.getStatisticByMonth(
+        currentMonth
+      );
+
+      if (Array.isArray(res) && res.length > 0) {
+        setData(res);
+        setDataStatDay(statDay);
+        setDataStatMonth(statMonth);
+        setTotalPage(Math.ceil(res.length / COUNT));
+        setCurrenPage(1);
+        setCurrenData(res.slice(0, COUNT));
+        setIsLoading(false);
+      } else {
+        setData([]);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching blog data:", error);
+      setData([]);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
 
   useEffect(() => {}, [totalPage, isLoading, currenData, currenPage]);
 
@@ -85,28 +138,24 @@ export default function Timekeeping() {
               </span>
             </h5>
           </div>
-          <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3"></div>
+          <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
+            <ModalCreateTeacher />
+          </div>
         </div>
         <div className="overflow-x-auto mt-4">
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="w-64 px-4 py-3">
-                  TIÊU ĐỀ
+                  GIÁO VIÊN
                 </th>
-                <th scope="col" className="w-32 px-4 py-3">
-                  TAG
+                <th scope="col" className="w-72 px-4 py-3">
+                  TRẠNG THÁI LÀM VIỆC
                 </th>
-                <th scope="col" className="w-80 px-4 py-3">
-                  NỘI DUNG
+                <th scope="col" className="w-28 px-4 py-3">
+                  THỐNG KÊ
                 </th>
-                <th scope="col" className="w-32 px-4 py-3">
-                  TÁC GIẢ
-                </th>
-                <th scope="col" className="w-24 px-4 py-3">
-                  NGÀY
-                </th>
-                <th scope="col" className="w-24 px-4 py-3">
+                <th scope="col" className="w-28 px-4 py-3">
                   CHI TIẾT
                 </th>
               </tr>
@@ -120,40 +169,62 @@ export default function Timekeeping() {
                       item?.deleted_at ? "hidden" : ""
                     } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
                   >
-                    <td className="w-64 px-4 py-2 grid grid-cols-12 gap-3 items-center">
+                    <td className="w-[85%] px-4 py-2 my-1 grid grid-cols-12 gap-3 items-center">
                       <Image
-                        src={item?.thumbnail}
+                        src={item?.teacher_avatar}
                         alt="img"
-                        className="w-auto h-20 mr-3 rounded-md col-span-6"
+                        className="w-20 h-20 mr-3 object-cover rounded-md col-span-5"
                         width={100}
                         height={0}
                       />
-                      <span className="col-span-6 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {item?.title}
+                      <span className="col-span-7 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                        {item?.teacher_name}
                       </span>
                     </td>
-                    <td className="w-32 px-4 py-2">
-                      <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {/* {HELPER.renderTag(item?.tag)} */}
-                      </span>
-                    </td>
-                    <td className="w-80 px-4 py-2">
+
+                    <td className="w-72 px-4 py-2">
                       <span className="text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {/* <div
-                          dangerouslySetInnerHTML={{
-                            __html: HELPER.sanitizeContent(item?.content),
-                          }}
-                        /> */}
+                        <div className="flex items-center">
+                          {item.latest_status === "need-check-in" ? (
+                            <>
+                              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                              <span>
+                                Đã check in lúc{" "}
+                                {HELPER.formatDate2(
+                                  item.latest_datetime_check_out
+                                )}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                              <span>
+                                Đã check out lúc{" "}
+                                {HELPER.formatDate2(
+                                  item.latest_datetime_check_in
+                                )}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </span>
                     </td>
-                    <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {item?.author}
+                    <td className="w-28 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                      <div className="mb-2">
+                        <ModalStatisticDay
+                          data={item}
+                          teacher={getStatDayById(item._id)}
+                        />
+                      </div>
+                      <div>
+                        <ModalStatisticMonth
+                          data={item}
+                          teacher={getStatMonthById(item._id)}
+                        />
+                      </div>
                     </td>
-                    <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {/* {HELPER.formatDate(item?.created_at)} */}
-                    </td>
-                    <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {/* <ModalUpdateBlog data={item} /> */}
+                    <td className="w-28 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                      <ModalUpdateTeacher data={item} />
                     </td>
                   </tr>
                 );
@@ -168,7 +239,7 @@ export default function Timekeeping() {
         ) : currenData.length === 0 ? (
           <div className="col-span-2 text-center w-full flex justify-center items-center py-4">
             <p className="text-gray-500 text-lg">
-              Không tìm thấy bài viết nào.
+              Không tìm thấy giáo viên nào.
             </p>
           </div>
         ) : (

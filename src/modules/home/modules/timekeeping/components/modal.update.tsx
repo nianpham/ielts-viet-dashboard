@@ -18,10 +18,9 @@ import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import "@/styles/hide-scroll.css";
-import { ReviewService } from "@/services/review";
-import { DATA } from "@/utils/data";
+import { TimekeepingService } from "@/services/timekeeping";
 
-export function ModalUpdateReview({ data }: { data: any }) {
+export function ModalUpdateTeacher({ data }: { data: any }) {
   const { toast } = useToast();
 
   const mainImageInputRef = useRef<HTMLInputElement>(null);
@@ -30,11 +29,8 @@ export function ModalUpdateReview({ data }: { data: any }) {
   const [isLoadingForDelete, setIsLoadingForDelete] = useState<boolean>(false);
 
   const [mainPreview, setMainPreview] = useState<string | null>(null);
+
   const [name, setName] = useState<string>("");
-  const [comment, setComment] = useState<string>("");
-  const [rating, setRating] = useState<string>("");
-  const [overall, setOverall] = useState<string>("");
-  const [school, setSchool] = useState<string>("");
 
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -61,60 +57,15 @@ export function ModalUpdateReview({ data }: { data: any }) {
   };
 
   const validateForm = () => {
-    if (!mainPreview) {
+    if (!mainPreview || name === "") {
       toast({
         variant: "destructive",
-        title: "Vui lòng chọn hình ảnh chính",
+        title: "Vui lòng điền đầy đủ thông tin",
       });
       return false;
+    } else {
+      return true;
     }
-
-    if (!name.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng nhập tiêu đề",
-      });
-      return false;
-    }
-
-    if (!comment.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng nhập nội dung",
-      });
-      return false;
-    }
-
-    if (!overall.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng nhập tên tác giả",
-      });
-      return false;
-    }
-
-    if (
-      isNaN(Number(rating)) ||
-      Number(rating) < 1 ||
-      Number(rating) > 5 ||
-      (Number(rating) * 10) % 1 !== 0
-    ) {
-      toast({
-        variant: "destructive",
-        title:
-          "Vui lòng nhập đánh giá từ 1 đến 5, chỉ chấp nhận 1 chữ số thập phân.",
-      });
-      return false;
-    }
-
-    if (!school.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng nhập tên tác giả",
-      });
-      return false;
-    }
-    return true;
   };
 
   const handleSubmit = async () => {
@@ -126,34 +77,26 @@ export function ModalUpdateReview({ data }: { data: any }) {
     ]);
 
     const body = {
-      name: name,
-      comment: comment,
-      rating: rating,
-      overall: overall,
-      school: school,
-      avatar: uploadMainImage[0]?.url || "",
+      teacher_name: name,
+      teacher_avatar: uploadMainImage[0]?.url || "",
     };
-    await ReviewService.updateReview(data?._id, body);
+    await TimekeepingService.updateTeacher(data?._id, body);
     setIsLoading(false);
 
-    window.location.href = "/?tab=reviews";
+    window.location.href = "/?tab=timekeeping";
   };
 
   const handleDelete = async () => {
     setIsLoadingForDelete(true);
-    await ReviewService.deleteReview(data?._id);
+    await TimekeepingService.deleteTeacher(data?._id);
     setIsLoadingForDelete(false);
-    window.location.href = "/?tab=reviews";
+    window.location.href = "/?tab=timekeeping";
   };
 
   const updateDOM = () => {
     if (data) {
-      setName(data?.name);
-      setComment(data?.comment);
-      setRating(data?.rating);
-      setOverall(String(data?.overall));
-      setSchool(data?.school);
-      setMainPreview(data?.avatar);
+      setName(data?.teacher_name);
+      setMainPreview(data?.teacher_avatar);
     }
   };
 
@@ -162,19 +105,19 @@ export function ModalUpdateReview({ data }: { data: any }) {
   return (
     <Dialog>
       <DialogTrigger asChild onClick={updateDOM}>
-        <Button variant="outline">Chỉnh sửa</Button>
+        <Button variant="outline">Chi tiết</Button>
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-[1200px]"
+        className="sm:max-w-[1200px] max-h-[100vh]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="!text-[20px]">Chỉnh sửa bài viết</span>
+            <span className="!text-[20px]">Chỉnh sửa thông tin</span>
           </DialogTitle>
           <DialogDescription>
             <span className="!text-[16px]">
-              Chỉnh sửa thông tin bài viết và nhấn{" "}
+              Chỉnh sửa thông tin giáo viên và nhấn{" "}
               <strong className="text-orange-700">Cập nhật</strong> để lưu thông
               tin.
             </span>
@@ -184,7 +127,7 @@ export function ModalUpdateReview({ data }: { data: any }) {
           <div className="col-span-1">
             <div className="mb-6">
               <Label htmlFor="thumbnail" className="text-right !text-[16px]">
-                Hình chính
+                Ảnh đại diện
               </Label>
               <div className="mt-2">
                 {!mainPreview && (
@@ -231,80 +174,42 @@ export function ModalUpdateReview({ data }: { data: any }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-screen max-h-[80vh] scroll-bar-style">
+          <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-full scroll-bar-style">
             <Label htmlFor="description" className="text-[16px]">
-              Tên học viên
+              Tên giáo viên
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="title"
+                id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Tên học viên"
+                placeholder="Tên giáo viên"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
             <Label htmlFor="description" className="text-[16px] mt-2">
-              Nội dung đánh giá
+              Vai trò
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Nội dung đánh giá"
-                className="col-span-3 p-2 border rounded h-32"
+                id="role"
+                value={data?.role}
+                // onChange={(e) => setFacebook(e.target.value)}
+                readOnly
+                placeholder="Vai trò"
+                className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
             <Label htmlFor="description" className="text-[16px] mt-2">
-              Đánh giá
-            </Label>
-            <div className="w-full grid items-center gap-4">
-              <input
-                id="rating"
-                type="number"
-                step="0.1"
-                min="1"
-                max="5"
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-                placeholder="Đánh giá"
-                className="col-span-3 p-2 border rounded"
-              />
-            </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Overall
-            </Label>
-            <div className="w-full grid items-center gap-4">
-              <select
-                id="overall"
-                value={overall}
-                onChange={(e) => setOverall(e.target.value)}
-                className="col-span-3 p-2 border rounded"
-              >
-                <option value="" disabled>
-                  Chọn điểm Overall IELTS
-                </option>
-                {DATA.IELTS_SCORES.map((item, index) => (
-                  <option
-                    key={index}
-                    value={item.value}
-                    selected={String(item.value) === overall}
-                  >
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Trường học
+              Mã đăng nhập
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="school"
-                value={school}
-                onChange={(e) => setSchool(e.target.value)}
-                placeholder="Trường học"
+                id="loginCode"
+                value={data?.login_code}
+                // onChange={(e) => setTwitter(e.target.value)}
+                placeholder="Mã đăng nhập"
+                readOnly
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>

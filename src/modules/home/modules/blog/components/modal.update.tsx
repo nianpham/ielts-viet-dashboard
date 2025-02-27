@@ -36,7 +36,6 @@ export function ModalUpdateBlog({ data }: { data: any }) {
   const [facebook, setFacebook] = useState<string>("");
   const [twitter, setTwitter] = useState<string>("");
   const [instagram, setInstagram] = useState<string>("");
-  // const [tag, setTag] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
 
   const handleMainImageChange = (
@@ -64,13 +63,7 @@ export function ModalUpdateBlog({ data }: { data: any }) {
   };
 
   const validateForm = () => {
-    if (
-      !mainPreview ||
-      title === "" ||
-      content === "" ||
-      // tag === "" ||
-      author === ""
-    ) {
+    if (!mainPreview || title === "" || content === "" || author === "") {
       toast({
         variant: "destructive",
         title: "Vui lòng điền đầy đủ thông tin",
@@ -158,12 +151,11 @@ export function ModalUpdateBlog({ data }: { data: any }) {
       facebook: facebook,
       twitter: twitter,
       instagram: instagram,
-      // tag: tag,
       author_id: "67a8779e9ce92c2626f05d66",
       author_name: author,
       thumbnail: uploadMainImage[0]?.url || "",
     };
-    const check = await BlogService.updateBlog(data?._id, body);
+    await BlogService.updateBlog(data?._id, body);
     setIsLoading(false);
 
     window.location.href = "/?tab=blog";
@@ -184,7 +176,6 @@ export function ModalUpdateBlog({ data }: { data: any }) {
       setFacebook(data?.facebook);
       setTwitter(data?.twitter);
       setInstagram(data?.instagram);
-      // setTag(data?.tag);
       setMainPreview(data?.thumbnail);
     }
   };
@@ -218,16 +209,8 @@ export function ModalUpdateBlog({ data }: { data: any }) {
               <Label htmlFor="thumbnail" className="text-right !text-[16px]">
                 Hình chính
               </Label>
-              {mainPreview ? (
-                <Image
-                  src={mainPreview}
-                  alt="main-preview"
-                  className="w-full rounded-md mt-2"
-                  width={200}
-                  height={0}
-                />
-              ) : (
-                <div className="col-span-3 mt-2">
+              <div className="mt-2">
+                {!mainPreview && (
                   <div
                     onClick={handleUpdateMainImage}
                     className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
@@ -239,18 +222,42 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                       </span>
                     </div>
                   </div>
-                  <input
-                    type="file"
-                    ref={mainImageInputRef}
-                    onChange={handleMainImageChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-              )}
+                )}
+                <input
+                  type="file"
+                  ref={mainImageInputRef}
+                  onChange={handleMainImageChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                {mainPreview && (
+                  <div className="mt-2">
+                    <Image
+                      src={mainPreview}
+                      alt="main-preview"
+                      className="w-full rounded-md mt-2"
+                      width={1000}
+                      height={1000}
+                    />
+                    <div
+                      onClick={handleUpdateMainImage}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-3 mt-5 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
+                    >
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500">
+                          Thay đổi hình ảnh
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex flex-col justify-start items-start gap-4 col-span-2 overflow-auto h-screen max-h-[80vh] scroll-bar-style">
+          <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-screen max-h-[80vh] scroll-bar-style">
+            <Label htmlFor="description" className="text-[16px]">
+              Tiêu đề bài viết
+            </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="title"
@@ -263,6 +270,10 @@ export function ModalUpdateBlog({ data }: { data: any }) {
             <div className="w-full grid items-center gap-4">
               <BlogDescriptionEditor value={content} onChange={setContent} />
             </div>
+
+            <Label htmlFor="description" className="text-[16px] mt-2">
+              Link Facebook
+            </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="facebook"
@@ -272,6 +283,9 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
+            <Label htmlFor="description" className="text-[16px] mt-2">
+              Link Twitter
+            </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="twitter"
@@ -281,6 +295,9 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
+            <Label htmlFor="description" className="text-[16px] mt-2">
+              Link Instagram
+            </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="instagram"
@@ -290,6 +307,9 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
+            <Label htmlFor="description" className="text-[16px] mt-2">
+              Tác giả
+            </Label>
             <div className="w-full grid items-center gap-4">
               <select
                 id="author"

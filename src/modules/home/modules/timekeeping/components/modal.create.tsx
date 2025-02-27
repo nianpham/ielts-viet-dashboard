@@ -18,13 +18,14 @@ import { Loader, Plus } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import "@/styles/hide-scroll.css";
-import { SliderService } from "@/services/sliders";
+import { TimekeepingService } from "@/services/timekeeping";
 
-export function ModalCreateSlider() {
+export function ModalCreateTeacher() {
   const { toast } = useToast();
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mainPreview, setMainPreview] = useState<string | null>(null);
+  const [name, setName] = useState<string>("");
 
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -54,7 +55,7 @@ export function ModalCreateSlider() {
     if (!mainPreview) {
       toast({
         variant: "destructive",
-        title: "Vui lòng chọn hình ảnh.",
+        title: "Vui lòng chọn ảnh đại diện.",
       });
       return false;
     }
@@ -70,12 +71,14 @@ export function ModalCreateSlider() {
     ]);
 
     const body = {
-      image: uploadMainImage[0]?.url || "",
+      teacher_name: name,
+      teacher_avatar: uploadMainImage[0]?.url || "",
+      role: "Giảng viên",
     };
-    await SliderService.createSlider(body);
+    await TimekeepingService.createTeacher(body);
     setIsLoading(false);
 
-    window.location.href = "/?tab=slider";
+    window.location.href = "/?tab=timekeeping";
   };
 
   return (
@@ -85,30 +88,30 @@ export function ModalCreateSlider() {
           type="button"
           className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-orange-700"
         >
-          <Plus size={16} className="mr-2" /> Thêm hình ảnh
+          <Plus size={16} className="mr-2" /> Thêm giáo viên
         </button>
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-[600px]"
+        className="sm:max-w-[500px] max-h-[100vh] overflow-hidden"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="!text-[20px]">Thêm hình ảnh mới</span>
+            <span className="!text-[20px]">Thêm giáo viên mới</span>
           </DialogTitle>
           <DialogDescription>
             <span className="!text-[16px]">
-              Tải lên hình ảnh và nhấn{" "}
-              <strong className="text-orange-700">Lưu</strong> để chèn hình ảnh
-              mới vào slider.
+              Điền thông tin giáo viên và nhấn{" "}
+              <strong className="text-orange-700">Lưu</strong> để thêm giáo viên
+              mới.
             </span>
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full grid grid-cols-1 gap-8">
-          <div className="col-span-1">
+        <div className="w-full grid grid-cols-1 gap-4 max-h-[70vh] overflow-y-auto scroll-bar-style">
+          <div className="col-span-1 overflow-hidden">
             <div className="mb-6">
               <Label htmlFor="thumbnail" className="text-right !text-[16px]">
-                Hình ảnh
+                Ảnh đại diện
               </Label>
               <div className="mt-2">
                 {!mainPreview && (
@@ -155,8 +158,22 @@ export function ModalCreateSlider() {
               </div>
             </div>
           </div>
+          <div className="flex flex-col justify-start items-start gap-2">
+            <Label htmlFor="description" className="text-[16px]">
+              Tên giáo viên
+            </Label>
+            <div className="w-full grid items-center gap-4">
+              <textarea
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Tên giáo viên"
+                className="col-span-3 p-2 border rounded"
+              ></textarea>
+            </div>
+          </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex justify-center items-end gap-4">
           <DialogClose asChild>
             <Button
               type="button"

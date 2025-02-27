@@ -30,7 +30,9 @@ const BlogDescriptionEditor = ({
   };
   return (
     <div className="w-full space-y-2">
-      <Label htmlFor="description">Mô tả bài viết</Label>
+      <Label htmlFor="description" className="text-[16px]">
+        Mô tả bài viết
+      </Label>
       <div className="min-h-[350px]">
         <ReactQuill
           id="description"
