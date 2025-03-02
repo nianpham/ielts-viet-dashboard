@@ -34,18 +34,14 @@ export function ModalStatisticDay({
   teacherDay: any;
   teacherMonth: any;
 }) {
-  const [currentMonth, setCurrentMonth] = useState<number>(0);
+  const [currentMonth, setCurrentMonth] = useState<string>("");
 
   useEffect(() => {
-    const currentMonth = new Date().getMonth() + 1;
-    setCurrentMonth(currentMonth);
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    setCurrentMonth(`${month}/${year}`);
   }, [data, teacherMonth, setCurrentMonth]);
-  const [currentYear, setCurrentYear] = useState<number>(0);
-
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    setCurrentYear(currentYear);
-  }, [data, setCurrentYear]);
 
   const [isDay, setIsDay] = useState<boolean>(true);
 
@@ -88,7 +84,6 @@ export function ModalStatisticDay({
 
     if (teacherDay && data) {
       const stats = calculateTimekeepingStats(teacherDay?.timekeeping);
-
       setStatsDay(stats);
     }
   }, [data, teacherDay]);
@@ -112,7 +107,7 @@ export function ModalStatisticDay({
               </span>
             ) : (
               <span className="!text-[20px]">
-                Thống kê làm việc tháng {currentMonth}/{currentYear}
+                Thống kê làm việc tháng {currentMonth}
               </span>
             )}
           </DialogTitle>
@@ -270,8 +265,7 @@ export function ModalStatisticDay({
                 </div>
               </div>
               <div className="mt-2 font-bold">
-                Thông tin số ca làm việc trong tháng {currentMonth}/
-                {currentYear}
+                Thông tin số ca làm việc trong tháng {currentMonth}
               </div>
               <div className="w-full mb-5">
                 <table className="w-full border-collapse">

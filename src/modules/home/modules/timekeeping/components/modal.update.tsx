@@ -166,7 +166,7 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
                     <Image
                       src={mainPreview}
                       alt="main-preview"
-                      className="w-full rounded-md mt-2"
+                      className="w-full h-96 object-cover rounded-md mt-2"
                       width={1000}
                       height={1000}
                     />

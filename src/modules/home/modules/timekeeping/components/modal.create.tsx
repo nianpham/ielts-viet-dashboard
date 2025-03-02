@@ -59,6 +59,14 @@ export function ModalCreateTeacher() {
       });
       return false;
     }
+
+    if (!name) {
+      toast({
+        variant: "destructive",
+        title: "Vui lòng điền tên giáo viên.",
+      });
+      return false;
+    }
     return true;
   };
 
