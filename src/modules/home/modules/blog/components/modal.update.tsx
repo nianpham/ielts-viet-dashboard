@@ -270,7 +270,7 @@ export function ModalUpdateBlog({ data }: { data: any }) {
             <div className="w-full grid items-center gap-4">
               <BlogDescriptionEditor value={content} onChange={setContent} />
             </div>
-
+            {/* 
             <Label htmlFor="description" className="text-[16px] mt-2">
               Link Facebook
             </Label>
@@ -306,7 +306,7 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 placeholder="Link Instagram"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
-            </div>
+            </div> */}
             <Label htmlFor="description" className="text-[16px] mt-2">
               Tác giả
             </Label>

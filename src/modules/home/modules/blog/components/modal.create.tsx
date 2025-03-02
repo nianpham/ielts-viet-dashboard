@@ -275,7 +275,7 @@ export function ModalCreateBlog() {
               ></textarea>
             </div>
             <BlogDescriptionEditor value={content} onChange={setContent} />
-            <Label htmlFor="description" className="text-[16px] mt-2">
+            {/* <Label htmlFor="description" className="text-[16px] mt-2">
               Link Facebook
             </Label>
             <div className="w-full grid items-center gap-4">
@@ -310,7 +310,7 @@ export function ModalCreateBlog() {
                 placeholder="Link Instagram"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
-            </div>
+            </div> */}
             <Label htmlFor="description" className="text-[16px] mt-2">
               Tác giả
             </Label>
