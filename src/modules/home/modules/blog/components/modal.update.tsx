@@ -318,7 +318,7 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 className="col-span-3 p-2 border rounded"
               >
                 <option value="">Tác giả</option>
-                <option value="Kim Hoàng">Kim Hoàng</option>
+                <option value="Trương Hoàng Hậu">Trương Hoàng Hậu</option>
               </select>
             </div>
           </div>
