@@ -210,18 +210,17 @@ export default function Timekeeping() {
                       </span>
                     </td>
                     <td className="w-28 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
-                      <div className="mb-2">
-                        <ModalStatisticDay
-                          data={item}
-                          teacher={getStatDayById(item._id)}
-                        />
-                      </div>
-                      <div>
+                      <ModalStatisticDay
+                        data={item}
+                        teacherDay={getStatDayById(item._id)}
+                        teacherMonth={getStatMonthById(item._id)}
+                      />
+                      {/* <div>
                         <ModalStatisticMonth
                           data={item}
                           teacher={getStatMonthById(item._id)}
                         />
-                      </div>
+                      </div> */}
                     </td>
                     <td className="w-28 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
                       <ModalUpdateTeacher data={item} />

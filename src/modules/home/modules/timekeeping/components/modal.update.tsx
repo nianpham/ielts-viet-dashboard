@@ -31,6 +31,7 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
   const [mainPreview, setMainPreview] = useState<string | null>(null);
 
   const [name, setName] = useState<string>("");
+  const [loginCode, setLoginCode] = useState<string>("");
 
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -63,9 +64,17 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
         title: "Vui lòng điền đầy đủ thông tin",
       });
       return false;
-    } else {
-      return true;
     }
+
+    const isValidLoginCode = /^\d{4}$/.test(loginCode);
+    if (!isValidLoginCode) {
+      toast({
+        variant: "destructive",
+        title: "Mã đăng nhập phải là 4 chữ số",
+      });
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async () => {
@@ -78,6 +87,7 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
 
     const body = {
       teacher_name: name,
+      login_code: loginCode,
       teacher_avatar: uploadMainImage[0]?.url || "",
     };
     await TimekeepingService.updateTeacher(data?._id, body);
@@ -96,6 +106,7 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
   const updateDOM = () => {
     if (data) {
       setName(data?.teacher_name);
+      setLoginCode(data?.login_code);
       setMainPreview(data?.teacher_avatar);
     }
   };
@@ -206,10 +217,9 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="loginCode"
-                value={data?.login_code}
-                // onChange={(e) => setTwitter(e.target.value)}
+                value={loginCode}
+                onChange={(e) => setLoginCode(e.target.value)}
                 placeholder="Mã đăng nhập"
-                readOnly
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
