@@ -7,7 +7,6 @@ import { Loader } from "lucide-react";
 import { TimekeepingService } from "@/services/timekeeping";
 import { HELPER } from "@/utils/helper";
 import { ModalStatisticDay } from "./components/modal.day";
-import { ModalStatisticMonth } from "./components/modal.month";
 import { ModalCreateTeacher } from "./components/modal.create";
 import { ModalUpdateTeacher } from "./components/modal.update";
 
@@ -153,10 +152,10 @@ export default function Timekeeping() {
                   TRẠNG THÁI LÀM VIỆC
                 </th>
                 <th scope="col" className="w-28 px-4 py-3">
-                  THỐNG KÊ
+                  GIỜ LÀM VIỆC
                 </th>
                 <th scope="col" className="w-28 px-4 py-3">
-                  CHI TIẾT
+                  THÔNG TIN
                 </th>
               </tr>
             </thead>
