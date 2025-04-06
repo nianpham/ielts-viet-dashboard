@@ -184,7 +184,7 @@ export default function Timekeeping() {
                     <td className="w-72 px-4 py-2">
                       <span className="text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                         <div className="flex items-center">
-                          {item.latest_status === "need-check-in" ? (
+                          {item.latest_status === "checked-in" ? (
                             <>
                               <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                               <span>
