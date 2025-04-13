@@ -19,6 +19,8 @@ export interface Teacher {
   latest_datetime_check_in: string;
   latest_datetime_check_out: string;
   latest_status: string;
+  work_status: string;
+  show_status: string;
 }
 export interface StatDay {
   _id: string;
@@ -142,7 +144,9 @@ export default function Timekeeping() {
           </div>
         </div>
         <div className="overflow-x-auto mt-4">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <table
+            className={`w-full text-sm text-left text-gray-500 dark:text-gray-400`}
+          >
             <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="w-64 px-4 py-3">
@@ -166,7 +170,11 @@ export default function Timekeeping() {
                     key={index}
                     className={`${
                       item?.deleted_at ? "hidden" : ""
-                    } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    } border-b border-l border-r dark:border-gray-600 ${
+                      item?.work_status === "able"
+                        ? "!bg-white"
+                        : "!bg-gray-300"
+                    } hover:bg-gray-100 dark:hover:bg-gray-700`}
                   >
                     <td className="w-[85%] px-4 py-2 my-1 grid grid-cols-12 gap-3 items-center">
                       <Image
@@ -183,29 +191,38 @@ export default function Timekeeping() {
 
                     <td className="w-72 px-4 py-2">
                       <span className="text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        <div className="flex items-center">
-                          {item.latest_status === "checked-in" ? (
-                            <>
-                              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                              <span>
-                                Đã check in lúc{" "}
-                                {HELPER.formatDate2(
-                                  item.latest_datetime_check_out
-                                )}
-                              </span>
-                            </>
-                          ) : (
+                        {item?.work_status === "able" ? (
+                          <div className="flex items-center">
+                            {item.latest_status === "checked-in" ? (
+                              <>
+                                <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                                <span>
+                                  Đã check in lúc{" "}
+                                  {HELPER.formatDate2(
+                                    item.latest_datetime_check_out
+                                  )}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                                <span>
+                                  Đã check out lúc{" "}
+                                  {HELPER.formatDate2(
+                                    item.latest_datetime_check_in
+                                  )}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
                             <>
                               <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                              <span>
-                                Đã check out lúc{" "}
-                                {HELPER.formatDate2(
-                                  item.latest_datetime_check_in
-                                )}
-                              </span>
+                              <span>Dừng làm việc</span>
                             </>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </span>
                     </td>
                     <td className="w-28 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">

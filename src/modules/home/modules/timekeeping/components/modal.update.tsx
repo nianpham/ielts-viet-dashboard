@@ -33,17 +33,30 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
   const [name, setName] = useState<string>("");
   const [loginCode, setLoginCode] = useState<string>("");
 
+  const [isWorking, setIsWorking] = useState<boolean>(
+    data?.work_status === "able"
+  );
+  const [isShow, setIsShow] = useState<boolean>(
+    data?.show_status === "activate"
+  );
+
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      alert("File quá lớn. Vui lòng chọn file nhỏ hơn 5MB");
+      toast({
+        variant: "destructive",
+        title: "File quá lớn. Vui lòng chọn file nhỏ hơn 5MB",
+      });
       return;
     }
     if (!file.type.startsWith("image/")) {
-      alert("Vui lòng chọn file hình ảnh");
+      toast({
+        variant: "destructive",
+        title: "Vui lòng chọn file hình ảnh",
+      });
       return;
     }
     const reader = new FileReader();
@@ -89,6 +102,8 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
       teacher_name: name,
       login_code: loginCode,
       teacher_avatar: uploadMainImage[0]?.url || "",
+      work_status: isWorking ? "able" : "enable",
+      show_status: isShow ? "activate" : "inactivate",
     };
     await TimekeepingService.updateTeacher(data?._id, body);
     setIsLoading(false);
@@ -108,10 +123,14 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
       setName(data?.teacher_name);
       setLoginCode(data?.login_code);
       setMainPreview(data?.teacher_avatar);
+      setIsWorking(data?.work_status === "able");
+      setIsShow(data?.show_status === "activate");
     }
   };
 
-  useEffect(() => {}, [data]);
+  useEffect(() => {
+    updateDOM();
+  }, [data]);
 
   return (
     <Dialog>
@@ -186,7 +205,7 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
             </div>
           </div>
           <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-full scroll-bar-style">
-            <Label htmlFor="description" className="text-[16px]">
+            <Label htmlFor="name" className="text-[16px]">
               Tên giáo viên
             </Label>
             <div className="w-full grid items-center gap-4">
@@ -198,20 +217,19 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
+            <Label htmlFor="role" className="text-[16px] mt-2">
               Vai trò
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
                 id="role"
                 value={data?.role}
-                // onChange={(e) => setFacebook(e.target.value)}
                 readOnly
                 placeholder="Vai trò"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
+            <Label htmlFor="loginCode" className="text-[16px] mt-2">
               Mã đăng nhập
             </Label>
             <div className="w-full grid items-center gap-4">
@@ -222,6 +240,67 @@ export function ModalUpdateTeacher({ data }: { data: any }) {
                 placeholder="Mã đăng nhập"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
+            </div>
+            <Label htmlFor="isShow" className="text-[16px] mt-2">
+              Hiện tài khoản trên trang chính
+            </Label>
+            <input
+              type="checkbox"
+              id="isShow"
+              className="switch ml-4"
+              checked={isShow}
+              onChange={(e) => setIsShow(e.target.checked)}
+            />
+
+            <Label htmlFor="neo-toggle" className="text-[16px] mt-2">
+              Trạng thái hoạt động
+            </Label>
+            <div className="neo-toggle-container pl-4">
+              <input
+                className="neo-toggle-input"
+                id="neo-toggle"
+                type="checkbox"
+                checked={isWorking}
+                onChange={(e) => setIsWorking(e.target.checked)}
+              />
+              <label className="neo-toggle" htmlFor="neo-toggle">
+                <div className="neo-track">
+                  <div className="neo-background-layer"></div>
+                  <div className="neo-grid-layer"></div>
+                  <div className="neo-spectrum-analyzer">
+                    <div className="neo-spectrum-bar"></div>
+                    <div className="neo-spectrum-bar"></div>
+                    <div className="neo-spectrum-bar"></div>
+                    <div className="neo-spectrum-bar"></div>
+                    <div className="neo-spectrum-bar"></div>
+                  </div>
+                  <div className="neo-track-highlight"></div>
+                </div>
+
+                <div className="neo-thumb">
+                  <div className="neo-thumb-ring"></div>
+                  <div className="neo-thumb-core">
+                    <div className="neo-thumb-icon">
+                      <div className="neo-thumb-wave"></div>
+                      <div className="neo-thumb-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="neo-gesture-area"></div>
+
+                <div className="neo-interaction-feedback">
+                  <div className="neo-ripple"></div>
+                  <div className="neo-progress-arc"></div>
+                </div>
+
+                <div className="neo-status">
+                  <div className="neo-status-indicator">
+                    <div className="neo-status-dot"></div>
+                    <div className="neo-status-text"></div>
+                  </div>
+                </div>
+              </label>
             </div>
           </div>
         </div>
