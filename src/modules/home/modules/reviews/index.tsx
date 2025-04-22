@@ -131,7 +131,7 @@ export default function Review() {
                       <Image
                         src={item?.avatar}
                         alt="img"
-                        className="w-auto h-20 mr-3 col-span-6 rounded-full"
+                        className="w-20 h-20 mr-3 object-cover col-span-6 rounded-full"
                         width={1000}
                         height={1000}
                       />

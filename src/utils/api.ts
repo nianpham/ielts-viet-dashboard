@@ -3,18 +3,18 @@ const BASE_URL = "https://api.farmcode.io.vn/v1";
 
 export const API = {
   //SLIDER
-  GET_ALL_SLIDER: `${BASE_URL}/ielts-viet/slider/`,
-  CREATE_SLIDER: `${BASE_URL}/ielts-viet/slider/`,
+  GET_ALL_SLIDER: `${BASE_URL}/ielts-viet/slider`,
+  CREATE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   DELETE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   //BLOG
-  GET_ALL_BLOG: `${BASE_URL}/ielts-viet/blog/`,
-  CREATE_BLOG: `${BASE_URL}/ielts-viet/blog/`,
+  GET_ALL_BLOG: `${BASE_URL}/ielts-viet/blog`,
+  CREATE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   UPDATE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   DELETE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   GET_BLOG_BY_ID: `${BASE_URL}/ielts-viet/blog`,
   //REVIEWS
-  GET_ALL_REVIEW: `${BASE_URL}/ielts-viet/review/`,
-  CREATE_REVIEW: `${BASE_URL}/ielts-viet/review/`,
+  GET_ALL_REVIEW: `${BASE_URL}/ielts-viet/review`,
+  CREATE_REVIEW: `${BASE_URL}/ielts-viet/review`,
   UPDATE_REVIEW: `${BASE_URL}/ielts-viet/review`,
   DELETE_REVIEW: `${BASE_URL}/ielts-viet/review`,
   GET_REVIEW_BY_ID: `${BASE_URL}/ielts-viet/review`,
