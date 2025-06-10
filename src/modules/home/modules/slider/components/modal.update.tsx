@@ -14,18 +14,20 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { UploadService } from "@/services/upload";
-import { Loader, Plus } from "lucide-react";
+import { Loader, PenLine, Plus } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import "@/styles/hide-scroll.css";
 import { SliderService } from "@/services/sliders";
 import "@/styles/hide-scroll.css";
 
-export function ModalCreateSlider() {
+export function ModalUpdateSlider({ data }: { data: any }) {
   const { toast } = useToast();
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [mainPreview, setMainPreview] = useState<string | null>(null);
+  const [mainPreview, setMainPreview] = useState<string | null>(
+    data?.image || null
+  );
   const [description, setDescription] = useState<string>("");
   const currentDate = new Date();
   const [eventTime, setEventTime] = useState<string>(
@@ -78,7 +80,7 @@ export function ModalCreateSlider() {
     const body = {
       image: uploadMainImage[0]?.url || "",
       description: description,
-      event_time: eventTime,
+      eventTime: eventTime,
     };
     await SliderService.createSlider(body);
     setIsLoading(false);
@@ -91,9 +93,9 @@ export function ModalCreateSlider() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-orange-700"
+          className="justify-center items-center px-3 py-3 rounded-full flex text-sm font-medium text-white bg-orange-700"
         >
-          <Plus size={16} className="mr-2" /> Thêm hình ảnh
+          <PenLine size={20} className="" />
         </button>
       </DialogTrigger>
       <DialogContent
@@ -169,7 +171,7 @@ export function ModalCreateSlider() {
               <div className="w-full grid items-center gap-4">
                 <textarea
                   id="description"
-                  value={description}
+                  value={data.description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Mô tả"
                   className="col-span-3 p-2 border rounded"
@@ -184,7 +186,7 @@ export function ModalCreateSlider() {
                 <input
                   type="date"
                   id="event-time"
-                  value={eventTime}
+                  value={data.event_time}
                   onChange={(e) => {
                     setEventTime(e.target.value);
                   }}

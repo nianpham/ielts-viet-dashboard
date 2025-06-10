@@ -8,6 +8,7 @@ import { SliderService } from "@/services/sliders";
 import Image from "next/image";
 import { ModalCreateSlider } from "./components/modal.create";
 import { ModalDeleteSlider } from "./components/modal.delete";
+import { ModalUpdateSlider } from "./components/modal.update";
 
 export default function Slider() {
   const COUNT = 12;
@@ -102,11 +103,11 @@ export default function Slider() {
                     return (
                       <div key={index} className="relative group w-full h-52">
                         <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
-                        <div className="cursor-pointer absolute top-[40%] left-[43%] hidden group-hover:flex z-10 transform duration-200">
-                          <ModalDeleteSlider
-                            data={item._id}
-                            image={item.image}
-                          />
+                        <div className="cursor-pointer absolute top-[40%] left-[33%] hidden group-hover:flex z-10 transform duration-200">
+                          <ModalDeleteSlider data={item} image={item.image} />
+                        </div>
+                        <div className="cursor-pointer absolute top-[40%] right-[33%] hidden group-hover:flex z-10 transform duration-200">
+                          <ModalUpdateSlider data={item} />
                         </div>
                         <Image
                           src={item?.image}

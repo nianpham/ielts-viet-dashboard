@@ -22,12 +22,16 @@ export function ModalDeleteSlider({
   data,
   image,
 }: {
-  data: string;
+  data: any;
   image: string;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [mainPreview, setMainPreview] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>(
+    data.description || ""
+  );
+  const [eventTime, setEventTime] = useState<string>(data.event_time || "");
 
   useEffect(() => {
     setMainPreview(image || null);
@@ -53,7 +57,7 @@ export function ModalDeleteSlider({
         </button>
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-[600px]"
+        className="sm:max-w-[600px] max-h-[90vh]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
@@ -68,7 +72,7 @@ export function ModalDeleteSlider({
             </span>
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full grid grid-cols-1 gap-8">
+        <div className="w-full grid grid-cols-1 gap-8 max-h-[60vh] overflow-y-auto scroll-bar-style">
           <div className="col-span-1">
             <div className="mb-6">
               <Label htmlFor="thumbnail" className="text-right !text-[16px]">
@@ -91,6 +95,35 @@ export function ModalDeleteSlider({
                   </div>
                 </div>
               )}
+            </div>
+            <div className="flex flex-col justify-start items-start gap-2 z-40">
+              <Label htmlFor="description" className="text-[16px]">
+                Mô tả
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <textarea
+                  id="description"
+                  value={description}
+                  disabled
+                  placeholder="Mô tả"
+                  className="col-span-3 p-2 border rounded"
+                ></textarea>
+              </div>
+            </div>{" "}
+            <div className="relative flex flex-col justify-start items-start gap-2 mt-4">
+              <Label htmlFor="event-time" className="text-[16px]">
+                Thời gian sự kiện
+              </Label>
+              <div className="w-full grid items-center gap-4 z-50">
+                <input
+                  type="date"
+                  id="event-time"
+                  value={eventTime}
+                  disabled
+                  placeholder="Thời gian sự kiện"
+                  className="col-span-3 p-2 border rounded"
+                />
+              </div>
             </div>
           </div>
         </div>
