@@ -7,6 +7,8 @@ import {
   Star,
   Timer,
   Newspaper,
+  Clapperboard,
+  BookCopy,
 } from "lucide-react";
 import { NavProjects } from "./nav-projects";
 import { TeamSwitcher } from "./team-switcher";
@@ -27,6 +29,18 @@ const data = {
       url: "?tab=slider",
       tab: "slider",
       icon: GalleryHorizontal,
+    },
+    {
+      name: "Video",
+      url: "?tab=video",
+      tab: "video",
+      icon: Clapperboard,
+    },
+    {
+      name: "Course",
+      url: "?tab=course",
+      tab: "course",
+      icon: BookCopy,
     },
     {
       name: "Bài Viết",

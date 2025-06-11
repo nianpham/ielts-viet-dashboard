@@ -20,6 +20,8 @@ import Slider from "./modules/slider";
 import Blog from "./modules/blog";
 import Review from "./modules/reviews";
 import TimeKeeping from "./modules/timekeeping";
+import Video from "./modules/video";
+import Course from "./modules/course";
 
 export default function HomeClient() {
   const param = useSearchParams();
@@ -28,6 +30,10 @@ export default function HomeClient() {
     switch (tab) {
       case "slider":
         return <Slider />;
+      case "video":
+        return <Video />;
+      case "course":
+        return <Course />;
       case "blog":
         return <Blog />;
       case "reviews":
@@ -43,6 +49,10 @@ export default function HomeClient() {
     switch (tab) {
       case "slider":
         return "Slider";
+      case "video":
+        return "Video";
+      case "course":
+        return "Khóa Học";
       case "blog":
         return "Bài Viết";
       case "reviews":

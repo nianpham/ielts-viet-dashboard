@@ -6,12 +6,21 @@ export const API = {
   GET_ALL_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   CREATE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   DELETE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
+  //VIDEO
+  GET_ALL_VIDEO: `${BASE_URL}/ielts-viet/videos`,
+  CREATE_VIDEO: `${BASE_URL}/ielts-viet/video`,
+  DELETE_VIDEO: `${BASE_URL}/ielts-viet/video`,
   //BLOG
   GET_ALL_BLOG: `${BASE_URL}/ielts-viet/blog`,
   CREATE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   UPDATE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   DELETE_BLOG: `${BASE_URL}/ielts-viet/blog`,
   GET_BLOG_BY_ID: `${BASE_URL}/ielts-viet/blog`,
+  //COURSE
+  GET_ALL_COURSE: `${BASE_URL}/ielts-viet/courses`,
+  CREATE_COURSE: `${BASE_URL}/ielts-viet/course`,
+  UPDATE_COURSE: `${BASE_URL}/ielts-viet/course`,
+  DELETE_COURSE: `${BASE_URL}/ielts-viet/course`,
   //REVIEWS
   GET_ALL_REVIEW: `${BASE_URL}/ielts-viet/review`,
   CREATE_REVIEW: `${BASE_URL}/ielts-viet/review`,
