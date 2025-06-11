@@ -11,39 +11,34 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Loader, Trash2 } from "lucide-react";
+import { Loader, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import "@/styles/hide-scroll.css";
 import { SliderService } from "@/services/sliders";
 import Image from "next/image";
 import { Label } from "@radix-ui/react-label";
+import { VideoService } from "@/services/video";
 
 export function ModalDeleteSlider({
   data,
-  image,
 }: {
   data: any;
-  image: string;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [mainPreview, setMainPreview] = useState<string | null>(null);
-  const [description, setDescription] = useState<string>(
-    data.description || ""
-  );
-  const [eventTime, setEventTime] = useState<string>(data.event_time || "");
 
   useEffect(() => {
-    setMainPreview(image || null);
-  }, [image]);
+    setMainPreview(data.video || null);
+  }, [data.video]);
 
   const handleDelete = async () => {
     setIsLoading(true);
 
-    await SliderService.deleteSlider(data);
+    await VideoService.deleteVideo(data._id);
     setIsLoading(false);
 
-    window.location.href = "/?tab=slider";
+    window.location.href = "/?tab=video";
   };
 
   return (
@@ -62,67 +57,49 @@ export function ModalDeleteSlider({
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="!text-[20px]">Xác nhận xóa hình ảnh</span>
+            <span className="!text-[20px]">Xác nhận xóa video</span>
           </DialogTitle>
           <DialogDescription>
             <span className="!text-[16px]">
-              Bạn chắn chắn muốn xóa hình ảnh này. Hãy nhấn{" "}
-              <strong className="text-orange-700">Xóa</strong> để xóa hình ảnh
-              đã chọn khỏi slider.
+              Bạn chắn chắn muốn xóa video này. Hãy nhấn{" "}
+              <strong className="text-orange-700">Xóa</strong> để xóa video
+              đã chọn.
             </span>
           </DialogDescription>
         </DialogHeader>
         <div className="w-full grid grid-cols-1 gap-8 max-h-[60vh] overflow-y-auto scroll-bar-style">
           <div className="col-span-1">
             <div className="mb-6">
-              <Label htmlFor="thumbnail" className="text-right !text-[16px]">
-                Hình ảnh
-              </Label>
-              {mainPreview ? (
-                <Image
-                  src={mainPreview}
-                  alt="main-preview"
-                  className="w-full h-96 object-cover rounded-md mt-2"
-                  width={1000}
-                  height={1000}
-                />
-              ) : (
-                <div className="col-span-3 mt-2">
-                  <div className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer">
-                    <div className="flex flex-col items-center">
-                      <span>Hình ảnh bị lỗi</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col justify-start items-start gap-2 z-40">
-              <Label htmlFor="description" className="text-[16px]">
-                Mô tả
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <textarea
-                  id="description"
-                  value={description}
-                  disabled
-                  placeholder="Mô tả"
-                  className="col-span-3 p-2 border rounded"
-                ></textarea>
-              </div>
-            </div>{" "}
-            <div className="relative flex flex-col justify-start items-start gap-2 mt-4">
-              <Label htmlFor="event-time" className="text-[16px]">
-                Thời gian sự kiện
-              </Label>
-              <div className="w-full grid items-center gap-4 z-50">
+
+              <div className="mt-2">
                 <input
-                  type="date"
-                  id="event-time"
-                  value={eventTime}
-                  disabled
-                  placeholder="Thời gian sự kiện"
-                  className="col-span-3 p-2 border rounded"
+                  type="file"
+                  accept="video/mp4"
+                  className="hidden"
                 />
+                {mainPreview && (
+                  <div className="mt-2 relative">
+                    <video
+                      className="h-[370px] w-full rounded-lg object-contain object-center"
+                      controls
+                      autoPlay={false}
+                      muted
+                    >
+                      <source src={mainPreview} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    {/* <div
+                      onClick={handleUpdateMainImage}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-3 mt-5 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
+                    >
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500">
+                          Thay đổi video
+                        </span>
+                      </div>
+                    </div> */}
+                  </div>
+                )}
               </div>
             </div>
           </div>

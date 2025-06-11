@@ -3,11 +3,12 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Loader } from "lucide-react";
+import { ArrowRight, Loader } from "lucide-react";
 import { BlogService } from "@/services/blog";
 import { HELPER } from "@/utils/helper";
-import { ModalCreateBlog } from "./components/modal.create";
-import { ModalUpdateBlog } from "./components/modal.update";
+import { CourseService } from "@/services/course";
+import { ModalCreateCourse } from "./components/modal.create";
+import { ModalUpdateCourse } from "./components/modal.update";
 
 export interface Blog {
   _id: string;
@@ -52,7 +53,7 @@ export default function Course() {
 
   const init = async () => {
     try {
-      const res = await BlogService.getAll();
+      const res = await CourseService.getAll();
 
       if (Array.isArray(res) && res.length > 0) {
         setData(res);
@@ -65,7 +66,7 @@ export default function Course() {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Error fetching blog data:", error);
+      console.error("Error fetching course data:", error);
       setData([]);
       setIsLoading(false);
     }
@@ -75,7 +76,7 @@ export default function Course() {
     init();
   }, []);
 
-  useEffect(() => {}, [totalPage, isLoading, currenData, currenPage]);
+  useEffect(() => { }, [totalPage, isLoading, currenData, currenPage]);
 
   return (
     <section className="p-4">
@@ -84,12 +85,12 @@ export default function Course() {
           <div className="flex items-start flex-1">
             <h5>
               <span className="text-gray-800 text-[20px] font-bold">
-                DANH SÁCH BÀI VIẾT ({data?.length})
+                DANH SÁCH KHÓA HỌC ({data?.length})
               </span>
             </h5>
           </div>
           <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-            <ModalCreateBlog />
+            <ModalCreateCourse />
           </div>
         </div>
         <div className="overflow-x-auto mt-4">
@@ -97,16 +98,19 @@ export default function Course() {
             <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="w-64 px-4 py-3">
-                  TIÊU ĐỀ
+                  KHÓA HỌC
                 </th>
                 <th scope="col" className="w-80 px-4 py-3">
-                  NỘI DUNG
+                  MÔ TẢ
                 </th>
                 <th scope="col" className="w-32 px-4 py-3">
-                  TÁC GIẢ
+                  GIÁO VIÊN
+                </th>
+                <th scope="col" className="w-32 px-4 py-3">
+                  MỤC TIÊU
                 </th>
                 <th scope="col" className="w-24 px-4 py-3">
-                  NGÀY
+                  THỜI GIAN
                 </th>
                 <th scope="col" className="w-24 px-4 py-3">
                   CHI TIẾT
@@ -118,39 +122,41 @@ export default function Course() {
                 return (
                   <tr
                     key={index}
-                    className={`${
-                      item?.deleted_at ? "hidden" : ""
-                    } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`${item?.deleted_at ? "hidden" : ""
+                      } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
                   >
                     <td className="w-full px-4 py-2 grid grid-cols-12 gap-3 items-center">
                       <Image
                         src={item?.thumbnail}
                         alt="img"
-                        className="w-auto h-20 mr-3 rounded-md col-span-6"
+                        className="w-full object-cover h-20 mr-3 rounded-md col-span-6"
                         width={100}
                         height={0}
                       />
                       <span className="col-span-6 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        {item?.title}
+                        {item?.course_name}
                       </span>
                     </td>
-                    <td className="w-80 px-4 py-2">
+                    <td className="w-60 px-4 py-2">
                       <span className="text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: HELPER.sanitizeContent(item?.content),
-                          }}
-                        />
+                        <div>
+                          {item?.description || "Chưa có mô tả"}
+                        </div>
                       </span>
                     </td>
                     <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {item?.author_name}
+                      {item?.teacher_name}
+                    </td>
+                    <td className="w-44 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      <div className="flex items-center gap-1">
+                        {item?.input_score} <ArrowRight size={17} /> {item?.output_score}
+                      </div>
                     </td>
                     <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {HELPER.formatDate(item?.created_at)}
+                      {item?.duration}
                     </td>
                     <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      <ModalUpdateBlog data={item} />
+                      <ModalUpdateCourse data={item} />
                     </td>
                   </tr>
                 );
@@ -202,9 +208,8 @@ export default function Course() {
                     <li key={index} onClick={() => selectPage(item)}>
                       <a
                         href="#"
-                        className={`${
-                          item === currenPage ? "bg-orange-100" : "bg-white"
-                        } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
+                        className={`${item === currenPage ? "bg-orange-100" : "bg-white"
+                          } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
                       >
                         {item}
                       </a>

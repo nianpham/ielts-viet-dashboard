@@ -15,28 +15,33 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { BlogService } from "@/services/blog";
 import { UploadService } from "@/services/upload";
-import { Loader, Trash2 } from "lucide-react";
+import { Edit, Loader, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import BlogDescriptionEditor from "./quill";
 import "@/styles/hide-scroll.css";
+import { CourseService } from "@/services/course";
 
-export function ModalUpdateBlog({ data }: { data: any }) {
+export function ModalUpdateCourse({ data }: { data: any }) {
   const { toast } = useToast();
-
   const mainImageInputRef = useRef<HTMLInputElement>(null);
-
+  const teacherImageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingForDelete, setIsLoadingForDelete] = useState<boolean>(false);
-
   const [mainPreview, setMainPreview] = useState<string | null>(null);
-
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [facebook, setFacebook] = useState<string>("");
-  const [twitter, setTwitter] = useState<string>("");
-  const [instagram, setInstagram] = useState<string>("");
-  const [author, setAuthor] = useState<string>("");
+  const [teacherPreview, setTeacherPreview] = useState<string | null>(null);
+  const [courseName, setCourseName] = useState<string>("");
+  const [inputScore, setInputScore] = useState<string>("");
+  const [outputScore, setOutputScore] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [commission, setCommission] = useState<string[]>([]);
+  const [newCommission, setNewCommission] = useState<string>("");
+  const [editCommissionIndex, setEditCommissionIndex] = useState<number | null>(null);
+  const [studyTime, setStudyTime] = useState<string>("");
+  const [duration, setDuration] = useState<string>("");
+  const [teacherName, setTeacherName] = useState<string>("");
+  const [students, setStudents] = useState<number>(0);
+  const [lessons, setLessons] = useState<number>(0);
 
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -62,16 +67,62 @@ export function ModalUpdateBlog({ data }: { data: any }) {
     mainImageInputRef.current?.click();
   };
 
-  const validateForm = () => {
-    if (!mainPreview || title === "" || content === "" || author === "") {
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setPreview: (value: string | null) => void
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
       toast({
         variant: "destructive",
-        title: "Vui lòng điền đầy đủ thông tin",
+        title: "File quá lớn",
+        description: "Vui lòng chọn file nhỏ hơn 5MB",
+      });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast({
+        variant: "destructive",
+        title: "Định dạng không hợp lệ",
+        description: "Vui lòng chọn file hình ảnh",
+      });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUpdateImage = (ref: React.RefObject<HTMLInputElement>) => {
+    ref.current?.click();
+  };
+
+  const validateForm = () => {
+    if (!mainPreview) {
+      toast({
+        variant: "destructive",
+        title: "Vui lòng chọn hình ảnh chính",
       });
       return false;
-    } else {
-      return true;
     }
+    if (!teacherPreview) {
+      toast({
+        variant: "destructive",
+        title: "Vui lòng chọn hình ảnh giáo viên",
+      });
+      return false;
+    }
+    if (!courseName) {
+      toast({
+        variant: "destructive",
+        title: "Vui lòng nhập tên khóa học",
+      });
+      return false;
+    }
+    return true;
   };
 
   const handleImageUpload = useCallback(async (file: File) => {
@@ -133,54 +184,121 @@ export function ModalUpdateBlog({ data }: { data: any }) {
     return new File([u8arr], "image.png", { type: mime });
   };
 
+  const handleAddCommission = () => {
+    if (!newCommission.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Vui lòng nhập nội dung cam kết",
+      });
+      return;
+    }
+    if (editCommissionIndex !== null) {
+      const updatedCommissions = [...commission];
+      updatedCommissions[editCommissionIndex] = newCommission;
+      setCommission(updatedCommissions);
+      setEditCommissionIndex(null);
+    } else {
+      setCommission([...commission, newCommission]);
+    }
+    setNewCommission("");
+  };
+
+  const handleEditCommission = (index: number) => {
+    setNewCommission(commission[index]);
+    setEditCommissionIndex(index);
+  };
+
+  const handleDeleteCommission = (index: number) => {
+    setCommission(commission.filter((_, i) => i !== index));
+    if (editCommissionIndex === index) {
+      setEditCommissionIndex(null);
+      setNewCommission("");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
     setIsLoading(true);
 
-    const updatedContent = await replaceBase64WithCloudUrls(
-      content,
-      handleImageUpload
-    );
-
     const uploadMainImage: any = await UploadService.uploadToCloudinary([
       mainPreview,
     ]);
-    const body = {
-      title: title,
-      content: updatedContent,
-      facebook: facebook,
-      twitter: twitter,
-      instagram: instagram,
-      author_id: "67a8779e9ce92c2626f05d66",
-      author_name: author,
-      thumbnail: uploadMainImage[0]?.url || "",
-    };
-    await BlogService.updateBlog(data?._id, body);
-    setIsLoading(false);
+    const uploadTeacherImage: any = await UploadService.uploadToCloudinary([
+      teacherPreview,
+    ]);
 
-    window.location.href = "/?tab=blog";
+    const body = {
+      course_name: courseName,
+      thumbnail: uploadMainImage[0]?.secure_url || mainPreview,
+      input_score: inputScore,
+      output_score: outputScore,
+      commission: commission,
+      study_time: studyTime,
+      duration: duration,
+      description: description,
+      students: students,
+      lessons: lessons,
+      teacher_name: teacherName,
+      teacher_avatar: uploadTeacherImage[0]?.secure_url || teacherPreview,
+    };
+
+    try {
+      await CourseService.updateCourse(data?._id, body);
+      toast({
+        title: "Thành công",
+        description: "Khóa học đã được cập nhật thành công",
+      });
+      window.location.href = "/?tab=course";
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Không thể cập nhật khóa học",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = async () => {
     setIsLoadingForDelete(true);
-    await BlogService.deleteBlog(data?._id);
-    setIsLoadingForDelete(false);
-    window.location.href = "/?tab=blog";
+    try {
+      await CourseService.deleteCourse(data?._id);
+      toast({
+        title: "Thành công",
+        description: "Khóa học đã được xóa thành công",
+      });
+      window.location.href = "/?tab=course";
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Không thể xóa khóa học",
+      });
+    } finally {
+      setIsLoadingForDelete(false);
+    }
   };
 
   const updateDOM = () => {
     if (data) {
-      setTitle(data?.title);
-      setAuthor(data?.author_name);
-      setContent(data?.content);
-      setFacebook(data?.facebook);
-      setTwitter(data?.twitter);
-      setInstagram(data?.instagram);
-      setMainPreview(data?.thumbnail);
+      setCourseName(data?.course_name || "");
+      setMainPreview(data?.thumbnail || null);
+      setTeacherPreview(data?.teacher_avatar || null);
+      setInputScore(data?.input_score || "");
+      setOutputScore(data?.output_score || "");
+      setDescription(data?.description || "");
+      setCommission(data?.commission || []);
+      setStudyTime(data?.study_time || "");
+      setDuration(data?.duration || "");
+      setTeacherName(data?.teacher_name || "");
+      setStudents(data?.students || 0);
+      setLessons(data?.lessons || 0);
     }
   };
 
-  useEffect(() => {}, [data]);
+  useEffect(() => { }, [data]);
 
   return (
     <Dialog>
@@ -193,21 +311,21 @@ export function ModalUpdateBlog({ data }: { data: any }) {
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="!text-[20px]">Chỉnh sửa bài viết</span>
+            <span className="!text-[20px]">Chỉnh sửa khóa học</span>
           </DialogTitle>
           <DialogDescription>
             <span className="!text-[16px]">
-              Chỉnh sửa thông tin bài viết và nhấn{" "}
+              Chỉnh sửa thông tin khóa học và nhấn{" "}
               <strong className="text-orange-700">Cập nhật</strong> để lưu thông
               tin.
             </span>
           </DialogDescription>
         </DialogHeader>
         <div className="w-full grid grid-cols-3 gap-8">
-          <div className="col-span-1">
+          <div className="col-span-1 overflow-auto h-screen max-h-[80vh] scroll-bar-style">
             <div className="mb-6">
               <Label htmlFor="thumbnail" className="text-right !text-[16px]">
-                Hình chính
+                Hình khóa học
               </Label>
               <div className="mt-2">
                 {!mainPreview && (
@@ -253,74 +371,214 @@ export function ModalUpdateBlog({ data }: { data: any }) {
                 )}
               </div>
             </div>
+            <div className="mt-2 mb-5">
+              {!teacherPreview && (
+                <div
+                  onClick={() => handleUpdateImage(teacherImageInputRef)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
+                >
+                  <div className="flex flex-col items-center">
+                    <span>+ Tải hình lên</span>
+                    <span className="text-xs text-gray-500">
+                      hoặc kéo thả file vào đây
+                    </span>
+                  </div>
+                </div>
+              )}
+              <input
+                type="file"
+                ref={teacherImageInputRef}
+                onChange={(e) => handleImageChange(e, setTeacherPreview)}
+                accept="image/*"
+                className="hidden"
+              />
+              {teacherPreview && (
+                <div className="mt-2">
+                  <Image
+                    src={teacherPreview}
+                    alt="teacher-preview"
+                    className="w-full h-96 object-cover rounded-md mt-2"
+                    width={1000}
+                    height={1000}
+                  />
+                  <div
+                    onClick={() => handleUpdateImage(teacherImageInputRef)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-5 py-3 mt-5 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
+                  >
+                    <div className="flex flex-col items-center">
+                      <span className="text-xs text-gray-500">
+                        Thay đổi hình ảnh
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-screen max-h-[80vh] scroll-bar-style">
+          <div className="flex flex-col justify-start items-start gap-2 col-span-2 overflow-auto h-screen max-h-[80vh] scroll-bar-style pb-5">
+            <Label htmlFor="course_name" className="text-[16px]">
+              Tên khóa học
+            </Label>
+            <div className="w-full grid items-center gap-4">
+              <textarea
+                id="course_name"
+                value={courseName}
+                onChange={(e) => setCourseName(e.target.value)}
+                placeholder="Tên khóa học"
+                className="col-span-3 p-2 border rounded"
+              ></textarea>
+            </div>
+
             <Label htmlFor="description" className="text-[16px]">
-              Tiêu đề bài viết
+              Mô tả khóa học
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Tiêu đề bài viết"
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Mô tả khóa học"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
-            <div className="w-full grid items-center gap-4">
-              <BlogDescriptionEditor value={content} onChange={setContent} />
+
+            <Label htmlFor="commission" className="text-[16px]">
+              Cam kết khóa học
+            </Label>
+            <div className="w-full grid items-center gap-4 mb-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="commission"
+                  value={newCommission}
+                  onChange={(e) => setNewCommission(e.target.value)}
+                  placeholder="Nhập cam kết mới"
+                  className="col-span-3 border border-gray-200 !rounded w-full px-2.5"
+                />
+                <Button
+                  onClick={handleAddCommission}
+                  className="bg-orange-700 hover:bg-orange-800"
+                >
+                  {editCommissionIndex !== null ? "Cập nhật" : "Thêm"}
+                </Button>
+              </div>
+              {commission.length > 0 && (
+                <div className="mt-2">
+                  {commission.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border-b"
+                    >
+                      <span>{item}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditCommission(index)}
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteCommission(index)}
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {/* 
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Link Facebook
+
+            <Label htmlFor="input_score" className="text-[16px]">
+              Đầu vào
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="facebook"
-                value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
-                placeholder="Link Facebook"
+                id="input_score"
+                value={inputScore}
+                onChange={(e) => setInputScore(e.target.value)}
+                placeholder="Đầu vào"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Link Twitter
+            <Label htmlFor="output_score" className="text-[16px]">
+              Đầu ra
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="twitter"
-                value={twitter}
-                onChange={(e) => setTwitter(e.target.value)}
-                placeholder="Link Twitter"
+                id="output_score"
+                value={outputScore}
+                onChange={(e) => setOutputScore(e.target.value)}
+                placeholder="Đầu ra"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
             </div>
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Link Instagram
+            <Label htmlFor="study_time" className="text-[16px]">
+              Thời gian buổi học
             </Label>
             <div className="w-full grid items-center gap-4">
               <textarea
-                id="instagram"
-                value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                placeholder="Link Instagram"
+                id="study_time"
+                value={studyTime}
+                onChange={(e) => setStudyTime(e.target.value)}
+                placeholder="Thời gian buổi học"
                 className="col-span-3 p-2 border rounded"
               ></textarea>
-            </div> */}
-            <Label htmlFor="description" className="text-[16px] mt-2">
-              Tác giả
+            </div>
+            <Label htmlFor="duration" className="text-[16px]">
+              Thời gian khóa học
             </Label>
             <div className="w-full grid items-center gap-4">
-              <select
-                id="author"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
+              <textarea
+                id="duration"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="Thời gian khóa học"
                 className="col-span-3 p-2 border rounded"
-              >
-                <option value="">Tác giả</option>
-                <option value="Trương Hoàng Hậu">Trương Hoàng Hậu</option>
-              </select>
+              ></textarea>
             </div>
+            <Label htmlFor="teacher_name" className="text-[16px]">
+              Tên giáo viên
+            </Label>
+            <div className="w-full grid items-center gap-4">
+              <textarea
+                id="teacher_name"
+                value={teacherName}
+                onChange={(e) => setTeacherName(e.target.value)}
+                placeholder="Tên giáo viên"
+                className="col-span-3 p-2 border rounded"
+              ></textarea>
+            </div>
+            <Label htmlFor="students" className="text-[16px]">
+              Số lượng học viên
+            </Label>
+            <div className="w-full grid items-center gap-4">
+              <input
+                id="students"
+                type="number"
+                value={students}
+                onChange={(e) => setStudents(Number(e.target.value))}
+                placeholder="Số lượng học viên"
+                className="col-span-3 p-2 border rounded"
+              />
+            </div>
+            <Label htmlFor="lessons" className="text-[16px]">
+              Số lượng buổi học
+            </Label>
+            <div className="w-full grid items-center gap-4">
+              <input
+                id="lessons"
+                type="number"
+                value={lessons}
+                onChange={(e) => setLessons(Number(e.target.value))}
+                placeholder="Số lượng buổi học"
+                className="col-span-3 p-2 border rounded"
+              />
+            </div>
+
           </div>
         </div>
         <DialogFooter className="w-full !flex !flex-row !justify-between !items-center">

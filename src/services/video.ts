@@ -38,6 +38,27 @@ const createVideo = async (payload: any) => {
   }
 };
 
+const updateVideo = async (id: string, payload: any) => {
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const response = await fetch(`${API.UPDATE_VIDEO}/${id}`, {
+      method: "PUT",
+      headers: myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed - Status: ${response.status}`);
+    }
+    return true;
+  } catch (error: any) {
+    console.error("========= Error Create Video:", error);
+    return false;
+  }
+};
+
 const deleteVideo = async (id: any) => {
   try {
     const myHeaders = new Headers();
@@ -62,4 +83,5 @@ export const VideoService = {
   getAll,
   createVideo,
   deleteVideo,
+  updateVideo,
 };

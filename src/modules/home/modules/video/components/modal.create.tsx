@@ -133,6 +133,7 @@ export function ModalCreateSlider() {
 
       const body = {
         video: uploadMainImage[0]?.secure_url || "",
+        isDisplay: false,
       };
       await VideoService.createVideo(body);
       toast({
@@ -190,11 +191,10 @@ export function ModalCreateSlider() {
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
-                    className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed ${
-                      isDragging
+                    className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed ${isDragging
                         ? "border-orange-500 bg-orange-50"
                         : "border-gray-300"
-                    } bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer`}
+                      } bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer`}
                   >
                     <div className="flex flex-col items-center">
                       <span>+ Tải video lên</span>

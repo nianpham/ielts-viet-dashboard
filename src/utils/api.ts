@@ -9,6 +9,7 @@ export const API = {
   //VIDEO
   GET_ALL_VIDEO: `${BASE_URL}/ielts-viet/videos`,
   CREATE_VIDEO: `${BASE_URL}/ielts-viet/video`,
+  UPDATE_VIDEO: `${BASE_URL}/ielts-viet/video`,
   DELETE_VIDEO: `${BASE_URL}/ielts-viet/video`,
   //BLOG
   GET_ALL_BLOG: `${BASE_URL}/ielts-viet/blog`,
