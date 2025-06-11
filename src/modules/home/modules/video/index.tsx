@@ -111,7 +111,7 @@ export default function Video() {
                           <ModalUpdateVideo data={item} />
                         </div>
                         <video
-                          className="h-full w-full rounded-lg object-contain object-center"
+                          className="h-full w-[500px] rounded-lg object-contain object-center"
                           controls
                           autoPlay={false}
                           muted
