@@ -326,7 +326,7 @@ export function ModalStatisticDay({
               <div className="w-full">
                 <div className="mb-3 flex flex-row justify-between items-center w-full">
                   <div className="mb-0 font-bold">
-                    Thông tin chi tiết trong ngày
+                    Thông tin chi tiết trong ngày {currentDay}
                   </div>
                   <Button onClick={handleExportDayExcel} variant="outline" className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white">
                     Xuất CSV
@@ -485,7 +485,7 @@ export function ModalStatisticDay({
               </div>
               <div className="w-full">
                 <div className="flex flex-row justify-between items-center w-full mb-3">
-                  <div className="mb-0 font-bold">Thông tin chi tiết trong tháng</div>
+                  <div className="mb-0 font-bold">Thông tin chi tiết trong tháng {selectedMonth} năm {selectedYear}</div>
                   <Button onClick={handleExportMonthExcel} variant="outline" className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white">
                     Xuất CSV
                   </Button>
