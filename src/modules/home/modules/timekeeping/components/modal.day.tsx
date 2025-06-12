@@ -12,9 +12,10 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import "@/styles/hide-scroll.css";
 import { HELPER } from "@/utils/helper";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TimekeepingItem {
   _id: string;
@@ -34,29 +35,44 @@ export function ModalStatisticDay({
   teacherDay: any;
   teacherMonth: any;
 }) {
-  const [currentMonth, setCurrentMonth] = useState<string>("");
+  const currentDate = new Date();
+  const currentMonth = (currentDate.getMonth() + 1).toString(); // e.g., '6' for June
+  const currentYear = currentDate.getFullYear().toString(); // e.g., '2025'
 
-  useEffect(() => {
-    const date = new Date();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    setCurrentMonth(`${month}/${year}`);
-  }, [data, teacherMonth, setCurrentMonth]);
-
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth);
+  const [selectedYear, setSelectedYear] = useState<string>(currentYear);
   const [isDay, setIsDay] = useState<boolean>(true);
-
   const [statsDay, setStatsDay] = useState<{
     totalItems: number;
     lateItems: number;
     enoughItems: number;
   }>({ totalItems: 0, lateItems: 0, enoughItems: 0 });
-
   const [currentDay, setCurrentDay] = useState<string>("");
+
+  const months = [
+    'Tháng 1',
+    'Tháng 2',
+    'Tháng 3',
+    'Tháng 4',
+    'Tháng 5',
+    'Tháng 6',
+    'Tháng 7',
+    'Tháng 8',
+    'Tháng 9',
+    'Tháng 10',
+    'Tháng 11',
+    'Tháng 12',
+  ];
+
+  const years = Array.from(
+    { length: Number(currentYear) - 2000 + 1 },
+    (_, index) => (2000 + index).toString()
+  );
 
   const calculateTimekeepingStats = (timekeeping: TimekeepingItem[]) => {
     const ONE_HOUR_THIRTY_MINUTES = 90 * 60 * 1000;
 
-    const stats = timekeeping.reduce(
+    return timekeeping.reduce(
       (acc, item) => {
         const checkInTime = new Date(item.check_in).getTime();
         const checkOutTime = new Date(item.check_out).getTime();
@@ -73,17 +89,14 @@ export function ModalStatisticDay({
       },
       { totalItems: 0, lateItems: 0, enoughItems: 0 }
     );
-
-    return stats;
   };
 
   useEffect(() => {
     const currentDateTime = new Date().toISOString();
-
     setCurrentDay(HELPER.formatCurrentDate(currentDateTime));
 
-    if (teacherDay && data) {
-      const stats = calculateTimekeepingStats(teacherDay?.timekeeping);
+    if (teacherDay?.timekeeping?.length > 0) {
+      const stats = calculateTimekeepingStats(teacherDay.timekeeping);
       setStatsDay(stats);
     }
   }, [data, teacherDay]);
@@ -262,6 +275,37 @@ export function ModalStatisticDay({
                   <div className="font-semibold text-md text-gray-500">
                     {teacherMonth?.role}
                   </div>
+                </div>
+              </div>
+              <div className="flex flex-row justify-start items-center gap-3 w-full mt-2">
+                <div>
+                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn tháng" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month, index) => (
+                        <SelectItem key={index} value={(index + 1).toString()}>
+                          {month}
+                        </SelectItem>
+                      ))}
+
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn năm" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="mt-2 font-bold">
