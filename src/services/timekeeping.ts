@@ -17,6 +17,23 @@ const getAll = async () => {
   }
 };
 
+const getStatisticById = async (id: string) => {
+  try {
+    const response = await fetch(`${API.GET_STATISTIC_BY_ID}/${id}`, {
+      method: "GET",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed - Status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    return data.data;
+  } catch (error: any) {
+    console.error("========= Error Get Statistic:", error);
+    return false;
+  }
+};
+
 const createTeacher = async (payload: any) => {
   try {
     const myHeaders = new Headers();
@@ -120,4 +137,5 @@ export const TimekeepingService = {
   deleteTeacher,
   getStatisticByDay,
   getStatisticByMonth,
+  getStatisticById,
 };

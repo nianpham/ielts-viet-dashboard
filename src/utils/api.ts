@@ -30,6 +30,7 @@ export const API = {
   GET_REVIEW_BY_ID: `${BASE_URL}/ielts-viet/review`,
   //TIMEKEEPING
   GET_ALL_TEACHER: `${BASE_URL}/ielts-viet/account/`,
+  GET_STATISTIC_BY_ID: `${BASE_URL}/ielts-viet/timekeeping`,
   CREATE_TEACHER: `${BASE_URL}/ielts-viet/account/`,
   UPDATE_TEACHER: `${BASE_URL}/ielts-viet/account`,
   DELETE_TEACHER: `${BASE_URL}/ielts-viet/account`,
