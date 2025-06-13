@@ -15,7 +15,13 @@ import Image from "next/image";
 import { use, useEffect, useState } from "react";
 import "@/styles/hide-scroll.css";
 import { HELPER } from "@/utils/helper";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import DateSelection from "@/components/ui/date-picker";
 import { TimekeepingService } from "@/services/timekeeping";
 import * as XLSX from "xlsx";
@@ -41,9 +47,11 @@ export function ModalStatisticDay({
   const currentDate = new Date();
   const currentMonth = (currentDate.getMonth() + 1).toString();
   const currentYear = currentDate.getFullYear().toString();
-  const currentDateISO = currentDate.toISOString().split('T')[0];
+  const currentDateISO = currentDate.toISOString().split("T")[0];
 
-  const [statisticData, setStatisticData] = useState<TimekeepingItem[] | null>(null);
+  const [statisticData, setStatisticData] = useState<TimekeepingItem[] | null>(
+    null
+  );
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth);
   const [selectedYear, setSelectedYear] = useState<string>(currentYear);
   const [selectedDate, setSelectedDate] = useState<string>(currentDateISO);
@@ -81,21 +89,21 @@ export function ModalStatisticDay({
     }
   }, [data?._id]);
 
-  useEffect(() => { }, [statisticData]);
+  useEffect(() => {}, [statisticData]);
 
   const months = [
-    'Tháng 1',
-    'Tháng 2',
-    'Tháng 3',
-    'Tháng 4',
-    'Tháng 5',
-    'Tháng 6',
-    'Tháng 7',
-    'Tháng 8',
-    'Tháng 9',
-    'Tháng 10',
-    'Tháng 11',
-    'Tháng 12',
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12",
   ];
 
   const years = Array.from(
@@ -127,29 +135,39 @@ export function ModalStatisticDay({
 
   const exportToExcel = (data: TimekeepingItem[], isDaily: boolean) => {
     const headers = isDaily
-      ? ['STT', 'Giờ check in', 'Giờ check out', 'Trạng thái']
-      : ['STT', 'Ngày', 'Giờ check in', 'Giờ check out', 'Trạng thái'];
+      ? ["STT", "Giờ check in", "Giờ check out", "Trạng thái"]
+      : ["STT", "Ngày", "Giờ check in", "Giờ check out", "Trạng thái"];
 
     const rows = data.map((item, index) => {
       return isDaily
         ? {
-          STT: index + 1,
-          'Giờ check in': HELPER.formatDate2(item.check_in),
-          'Giờ check out': HELPER.formatDate2(item.check_out),
-          'Trạng thái': HELPER.getTimekeepingStatus(item.check_in, item.check_out),
-        }
+            STT: index + 1,
+            "Giờ check in": HELPER.formatDate2(item.check_in),
+            "Giờ check out": HELPER.formatDate2(item.check_out),
+            "Trạng thái": HELPER.getTimekeepingStatus(
+              item.check_in,
+              item.check_out
+            ),
+          }
         : {
-          STT: index + 1,
-          'Ngày': HELPER.formatCurrentDate(item.created_at),
-          'Giờ check in': HELPER.formatDate2(item.check_in),
-          'Giờ check out': HELPER.formatDate2(item.check_out),
-          'Trạng thái': HELPER.getTimekeepingStatus(item.check_in, item.check_out),
-        };
+            STT: index + 1,
+            Ngày: HELPER.formatCurrentDate(item.created_at),
+            "Giờ check in": HELPER.formatDate2(item.check_in),
+            "Giờ check out": HELPER.formatDate2(item.check_out),
+            "Trạng thái": HELPER.getTimekeepingStatus(
+              item.check_in,
+              item.check_out
+            ),
+          };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers });
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, isDaily ? 'Daily' : 'Monthly');
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      isDaily ? "Daily" : "Monthly"
+    );
 
     const filename = isDaily
       ? `${teacherDay.teacher_name}_ngày_${selectedDate}.xlsx`
@@ -161,7 +179,7 @@ export function ModalStatisticDay({
   const handleExportDayExcel = () => {
     if (statisticData) {
       const filteredDayData = statisticData.filter((item) => {
-        const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+        const itemDate = new Date(item.created_at).toISOString().split("T")[0];
         return itemDate === selectedDate;
       });
       exportToExcel(filteredDayData, true);
@@ -186,7 +204,7 @@ export function ModalStatisticDay({
 
     if (statisticData) {
       const filteredDayData = statisticData.filter((item) => {
-        const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+        const itemDate = new Date(item.created_at).toISOString().split("T")[0];
         return itemDate === selectedDate;
       });
       const dayStats = calculateTimekeepingStats(filteredDayData);
@@ -225,13 +243,9 @@ export function ModalStatisticDay({
         <DialogHeader>
           <DialogTitle>
             {isDay ? (
-              <span className="!text-[20px]">
-                Thống kê làm việc theo ngày
-              </span>
+              <span className="!text-[20px]">Thống kê làm việc theo ngày</span>
             ) : (
-              <span className="!text-[20px]">
-                Thống kê làm việc theo tháng
-              </span>
+              <span className="!text-[20px]">Thống kê làm việc theo tháng</span>
             )}
           </DialogTitle>
           <DialogDescription>
@@ -279,9 +293,7 @@ export function ModalStatisticDay({
                 </div>
               </div>
               <div>
-                <div className="mb-2 font-bold">
-                  Bộ lọc
-                </div>
+                <div className="mb-2 font-bold">Bộ lọc</div>
                 <input
                   type="date"
                   value={selectedDate}
@@ -328,15 +340,21 @@ export function ModalStatisticDay({
                   <div className="mb-0 font-bold">
                     Thông tin chi tiết trong ngày {currentDay}
                   </div>
-                  <Button onClick={handleExportDayExcel} variant="outline" className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white">
-                    Xuất CSV
+                  <Button
+                    onClick={handleExportDayExcel}
+                    variant="outline"
+                    className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white"
+                  >
+                    Xuất Excel
                   </Button>
                 </div>
                 <div className="w-full mb-5">
                   {statisticData && statisticData.length > 0 ? (
                     (() => {
                       const filteredData = statisticData.filter((item) => {
-                        const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+                        const itemDate = new Date(item.created_at)
+                          .toISOString()
+                          .split("T")[0];
                         return itemDate === selectedDate;
                       });
                       return filteredData.length > 0 ? (
@@ -369,8 +387,20 @@ export function ModalStatisticDay({
                                 <td className="border border-gray-200 p-2">
                                   {HELPER.formatDate2(item.check_out)}
                                 </td>
-                                <td className={`border border-gray-200 p-2 ${HELPER.getTimekeepingStatus(item.check_in, item.check_out) === 'Đủ giờ' ? 'text-green-600' : 'text-red-600'}`}>
-                                  {HELPER.getTimekeepingStatus(item.check_in, item.check_out)}
+                                <td
+                                  className={`border border-gray-200 p-2 ${
+                                    HELPER.getTimekeepingStatus(
+                                      item.check_in,
+                                      item.check_out
+                                    ) === "Đủ giờ"
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }`}
+                                >
+                                  {HELPER.getTimekeepingStatus(
+                                    item.check_in,
+                                    item.check_out
+                                  )}
                                 </td>
                               </tr>
                             ))}
@@ -414,27 +444,33 @@ export function ModalStatisticDay({
                 </div>
               </div>
               <div>
-                <div className="mb-2 font-bold">
-                  Bộ lọc
-                </div>
+                <div className="mb-2 font-bold">Bộ lọc</div>
                 <div className="flex flex-row justify-start items-center gap-3 w-full mt-2">
                   <div>
-                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <Select
+                      value={selectedMonth}
+                      onValueChange={setSelectedMonth}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Chọn tháng" />
                       </SelectTrigger>
                       <SelectContent>
                         {months.map((month, index) => (
-                          <SelectItem key={index} value={(index + 1).toString()}>
+                          <SelectItem
+                            key={index}
+                            value={(index + 1).toString()}
+                          >
                             {month}
                           </SelectItem>
                         ))}
-
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <Select
+                      value={selectedYear}
+                      onValueChange={setSelectedYear}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Chọn năm" />
                       </SelectTrigger>
@@ -452,7 +488,8 @@ export function ModalStatisticDay({
 
               <div className="w-full mb-0">
                 <div className="mb-2 font-bold">
-                  Thông tin số ca làm việc trong tháng {selectedMonth} năm {selectedYear}
+                  Thông tin số ca làm việc trong tháng {selectedMonth} năm{" "}
+                  {selectedYear}
                 </div>
                 <table className="w-full border-collapse">
                   <thead>
@@ -485,9 +522,16 @@ export function ModalStatisticDay({
               </div>
               <div className="w-full">
                 <div className="flex flex-row justify-between items-center w-full mb-3">
-                  <div className="mb-0 font-bold">Thông tin chi tiết trong tháng {selectedMonth} năm {selectedYear}</div>
-                  <Button onClick={handleExportMonthExcel} variant="outline" className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white">
-                    Xuất CSV
+                  <div className="mb-0 font-bold">
+                    Thông tin chi tiết trong tháng {selectedMonth} năm{" "}
+                    {selectedYear}
+                  </div>
+                  <Button
+                    onClick={handleExportMonthExcel}
+                    variant="outline"
+                    className="mb-0 border border-orange-700 hover:bg-orange-700 hover:text-white"
+                  >
+                    Xuất Excel
                   </Button>
                 </div>
                 <div className="w-full mb-5">
@@ -504,21 +548,29 @@ export function ModalStatisticDay({
                         <table className="w-full border-collapse">
                           <thead>
                             <tr className="bg-gray-100">
-                              <th className="border border-gray-200 p-2 text-left">STT</th>
-                              <th className="border border-gray-200 p-2 text-left">Ngày</th>
+                              <th className="border border-gray-200 p-2 text-left">
+                                STT
+                              </th>
+                              <th className="border border-gray-200 p-2 text-left">
+                                Ngày
+                              </th>
                               <th className="border border-gray-200 text-green-600 p-2 text-left">
                                 Giờ check in
                               </th>
                               <th className="border border-gray-200 text-red-600 p-2 text-left">
                                 Giờ check out
                               </th>
-                              <th className="border border-gray-200 p-2 text-left">Trạng thái</th>
+                              <th className="border border-gray-200 p-2 text-left">
+                                Trạng thái
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
                             {filteredMonthData.map((item, index) => (
                               <tr key={item._id}>
-                                <td className="border border-gray-200 p-2">{index + 1}</td>
+                                <td className="border border-gray-200 p-2">
+                                  {index + 1}
+                                </td>
                                 <td className="border border-gray-200 p-2">
                                   {HELPER.formatCurrentDate(item.created_at)}
                                 </td>
@@ -528,8 +580,20 @@ export function ModalStatisticDay({
                                 <td className="border border-gray-200 p-2">
                                   {HELPER.formatDate2(item.check_out)}
                                 </td>
-                                <td className={`border border-gray-200 p-2 ${HELPER.getTimekeepingStatus(item.check_in, item.check_out) === 'Đủ giờ' ? 'text-green-600' : 'text-red-600'}`}>
-                                  {HELPER.getTimekeepingStatus(item.check_in, item.check_out)}
+                                <td
+                                  className={`border border-gray-200 p-2 ${
+                                    HELPER.getTimekeepingStatus(
+                                      item.check_in,
+                                      item.check_out
+                                    ) === "Đủ giờ"
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }`}
+                                >
+                                  {HELPER.getTimekeepingStatus(
+                                    item.check_in,
+                                    item.check_out
+                                  )}
                                 </td>
                               </tr>
                             ))}
