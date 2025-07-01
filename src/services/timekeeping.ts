@@ -130,6 +130,46 @@ const getStatisticByMonth = async (month: number) => {
   }
 };
 
+const exportAllStatistics = async () => {
+  try {
+    const allTeachers = await getAll();
+    if (!allTeachers) {
+      throw new Error("Failed to get teachers");
+    }
+
+    const monthlyStats = [];
+    for (let month = 1; month <= 12; month++) {
+      const monthData = await getStatisticByMonth(month);
+      monthlyStats.push({
+        month,
+        data: monthData || [],
+      });
+    }
+
+    const dailyStats = await getStatisticByDay();
+
+    const teacherDetailedData = [];
+    for (const teacher of allTeachers) {
+      const detailedRecords = await getStatisticById(teacher._id);
+      teacherDetailedData.push({
+        teacherId: teacher._id,
+        teacherName: teacher.teacher_name,
+        records: detailedRecords || [],
+      });
+    }
+
+    return {
+      teachers: allTeachers,
+      monthlyStats,
+      dailyStats: dailyStats || [],
+      teacherDetailedData,
+    };
+  } catch (error: any) {
+    console.error("========= Error Export All Statistics:", error);
+    return false;
+  }
+};
+
 export const TimekeepingService = {
   getAll,
   createTeacher,
@@ -138,4 +178,5 @@ export const TimekeepingService = {
   getStatisticByDay,
   getStatisticByMonth,
   getStatisticById,
+  exportAllStatistics,
 };
