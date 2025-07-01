@@ -88,6 +88,12 @@ export function ModalUpdateSlider({ data }: { data: any }) {
     window.location.href = "/?tab=slider";
   };
 
+  useEffect(() => {
+    setMainPreview(data?.image || null);
+    setDescription(data?.description || "");
+    setEventTime(data?.eventTime || "");
+  }, [data]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
