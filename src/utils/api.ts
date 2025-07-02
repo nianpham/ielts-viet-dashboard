@@ -5,6 +5,7 @@ export const API = {
   //SLIDER
   GET_ALL_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   CREATE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
+  UPDATE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   DELETE_SLIDER: `${BASE_URL}/ielts-viet/slider`,
   //VIDEO
   GET_ALL_VIDEO: `${BASE_URL}/ielts-viet/videos`,

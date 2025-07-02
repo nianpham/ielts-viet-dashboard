@@ -28,10 +28,12 @@ export function ModalUpdateSlider({ data }: { data: any }) {
   const [mainPreview, setMainPreview] = useState<string | null>(
     data?.image || null
   );
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState<string>(
+    data?.description || ""
+  );
   const currentDate = new Date();
   const [eventTime, setEventTime] = useState<string>(
-    currentDate.toISOString().split("T")[0]
+    data?.event_time || currentDate.toISOString().split("T")[0]
   );
 
   const handleMainImageChange = (
@@ -73,19 +75,39 @@ export function ModalUpdateSlider({ data }: { data: any }) {
     if (!validateForm()) return;
     setIsLoading(true);
 
-    const uploadMainImage: any = await UploadService.uploadToCloudinary([
-      mainPreview,
-    ]);
+    try {
+      let imageUrl = data?.image || "";
 
-    const body = {
-      image: uploadMainImage[0]?.url || "",
-      description: description,
-      eventTime: eventTime,
-    };
-    await SliderService.createSlider(body);
-    setIsLoading(false);
+      if (mainPreview !== data?.image) {
+        const uploadMainImage: any = await UploadService.uploadToCloudinary([
+          mainPreview,
+        ]);
+        imageUrl = uploadMainImage[0]?.url || "";
+      }
 
-    window.location.href = "/?tab=slider";
+      const body = {
+        image: imageUrl,
+        description: description,
+        event_time: eventTime,
+      };
+
+      const res = await SliderService.updateSlider(data?._id, body);
+      setIsLoading(false);
+
+      toast({
+        title: "Cập nhật thành công!",
+        description: "Slider đã được cập nhật.",
+      });
+
+      window.location.href = "/?tab=slider";
+    } catch (error) {
+      setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Lỗi!",
+        description: "Không thể cập nhật slider. Vui lòng thử lại.",
+      });
+    }
   };
 
   return (
@@ -171,7 +193,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
               <div className="w-full grid items-center gap-4">
                 <textarea
                   id="description"
-                  value={data.description}
+                  value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Mô tả"
                   className="col-span-3 p-2 border rounded"
@@ -186,7 +208,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
                 <input
                   type="date"
                   id="event-time"
-                  value={data.event_time}
+                  value={eventTime}
                   onChange={(e) => {
                     setEventTime(e.target.value);
                   }}

@@ -38,6 +38,27 @@ const createSlider = async (payload: any) => {
   }
 };
 
+const updateSlider = async (id: any, payload: any) => {
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const response = await fetch(`${API.UPDATE_SLIDER}/${id}`, {
+      method: "PUT",
+      headers: myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed - Status: ${response.status}`);
+    }
+    return true;
+  } catch (error: any) {
+    console.error("========= Error Update Slider:", error);
+    return false;
+  }
+};
+
 const deleteSlider = async (id: any) => {
   try {
     const myHeaders = new Headers();
@@ -61,5 +82,6 @@ const deleteSlider = async (id: any) => {
 export const SliderService = {
   getAll,
   createSlider,
+  updateSlider,
   deleteSlider,
 };
