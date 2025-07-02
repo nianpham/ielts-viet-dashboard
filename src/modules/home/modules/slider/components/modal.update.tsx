@@ -110,6 +110,12 @@ export function ModalUpdateSlider({ data }: { data: any }) {
     }
   };
 
+  useEffect(() => {
+    setMainPreview(data?.image || null);
+    setDescription(data?.description || "");
+    setEventTime(data?.eventTime || "");
+  }, [data]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>

@@ -9,6 +9,7 @@ import { HELPER } from "@/utils/helper";
 import { ModalStatisticDay } from "./components/modal.day";
 import { ModalCreateTeacher } from "./components/modal.create";
 import { ModalUpdateTeacher } from "./components/modal.update";
+import { ModalExportTimekeeping } from "./components/modal.export";
 
 export interface Teacher {
   _id: string;
@@ -126,7 +127,7 @@ export default function Timekeeping() {
     init();
   }, []);
 
-  useEffect(() => {}, [totalPage, isLoading, currenData, currenPage]);
+  useEffect(() => { }, [totalPage, isLoading, currenData, currenPage]);
 
   return (
     <section className="p-4">
@@ -140,6 +141,7 @@ export default function Timekeeping() {
             </h5>
           </div>
           <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
+            <ModalExportTimekeeping />
             <ModalCreateTeacher />
           </div>
         </div>
@@ -168,13 +170,11 @@ export default function Timekeeping() {
                 return (
                   <tr
                     key={index}
-                    className={`${
-                      item?.deleted_at ? "hidden" : ""
-                    } border-b border-l border-r dark:border-gray-600 ${
-                      item?.work_status === "able"
+                    className={`${item?.deleted_at ? "hidden" : ""
+                      } border-b border-l border-r dark:border-gray-600 ${item?.work_status === "able"
                         ? "!bg-white"
                         : "!bg-gray-300"
-                    } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                      } hover:bg-gray-100 dark:hover:bg-gray-700`}
                   >
                     <td className="w-[85%] px-4 py-2 my-1 grid grid-cols-12 gap-3 items-center">
                       <Image
@@ -291,9 +291,8 @@ export default function Timekeeping() {
                     <li key={index} onClick={() => selectPage(item)}>
                       <a
                         href="#"
-                        className={`${
-                          item === currenPage ? "bg-orange-100" : "bg-white"
-                        } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
+                        className={`${item === currenPage ? "bg-orange-100" : "bg-white"
+                          } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
                       >
                         {item}
                       </a>
