@@ -11,49 +11,24 @@ import { ModalDeleteSlider } from "./components/modal.delete";
 import { ModalUpdateSlider } from "./components/modal.update";
 
 export default function Slider() {
-  const COUNT = 12;
-
   const [data, setData] = useState([] as any);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSortingUp, setIsSortingUp] = useState<boolean>(false);
+  const [isSortingDown, setIsSortingDown] = useState<boolean>(false);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [currenPage, setCurrenPage] = useState<any>(1 as any);
   const [currenData, setCurrenData] = useState<any>([] as any);
 
-  const selectPage = (pageSelected: any) => {
-    setCurrenPage(pageSelected);
-    const start = (pageSelected - 1) * COUNT;
-    const end = pageSelected * COUNT;
-    setCurrenData(data.slice(start, end));
-  };
-
-  const prevPage = () => {
-    if (currenPage > 1) {
-      selectPage(currenPage - 1);
-    }
-  };
-
-  const nextPage = () => {
-    if (currenPage < totalPage) {
-      selectPage(currenPage + 1);
-    }
-  };
-
-  const render = (data: any) => {
-    setData(data);
-    setTotalPage(Math.ceil(data.length / COUNT));
-    setCurrenPage(1);
-    setCurrenData(data.slice(0, COUNT));
-  };
-
   const init = async () => {
     try {
       const res = await SliderService.getAll();
-
       if (Array.isArray(res) && res.length > 0) {
-        setData(res);
-        setTotalPage(Math.ceil(res.length / COUNT));
+        const sorted = [...res].sort(
+          (a, b) => (a.order_index || 0) - (b.order_index || 0)
+        );
+        setData(sorted);
         setCurrenPage(1);
-        setCurrenData(res.slice(0, COUNT));
+        setCurrenData(sorted);
         setIsLoading(false);
       } else {
         setData([]);
@@ -72,6 +47,43 @@ export default function Slider() {
 
   useEffect(() => {}, [totalPage, isLoading, currenData, currenPage, data]);
 
+  const handleSortByDate = async (direction: "asc" | "desc") => {
+    if (!currenData || currenData.length === 0) return;
+    const sorted = [...currenData].sort((a, b) => {
+      const dateA = new Date(a.event_time).getTime();
+      const dateB = new Date(b.event_time).getTime();
+      return direction === "asc" ? dateA - dateB : dateB - dateA;
+    });
+    setIsSortingUp(direction === "asc");
+    setIsSortingDown(direction === "desc");
+    const updated = await Promise.all(
+      sorted.map(async (item, idx) => {
+        const newOrder = idx + 1;
+        if (item.order_index !== newOrder) {
+          try {
+            const res = await SliderService.updateSlider(item._id, {
+              image: item.image,
+              description: item.description,
+              event_time: item.event_time,
+              order_index: newOrder,
+            });
+          } catch (e) {
+            console.error(
+              "Failed to update order_index for slider",
+              item._id,
+              e
+            );
+          }
+        }
+        return { ...item, order_index: newOrder };
+      })
+    );
+    setCurrenData(updated);
+    setData(updated);
+    setIsSortingUp(false);
+    setIsSortingDown(false);
+  };
+
   return (
     <section className="p-4">
       <div className="">
@@ -84,8 +96,30 @@ export default function Slider() {
             </h5>
           </div>
           <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-            <ModalCreateSlider />
+            <ModalCreateSlider dataLength={data?.length} />
           </div>
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm flex items-center gap-2"
+            onClick={() => handleSortByDate("asc")}
+            type="button"
+          >
+            Sắp xếp ngày{" "}
+            {isSortingUp ? <Loader className="animate-spin" size={16} /> : "↑"}
+          </button>
+          <button
+            className="ml-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm flex items-center gap-2"
+            onClick={() => handleSortByDate("desc")}
+            type="button"
+          >
+            Sắp xếp ngày{" "}
+            {isSortingDown ? (
+              <Loader className="animate-spin" size={16} />
+            ) : (
+              "↓"
+            )}
+          </button>
         </div>
         {isLoading && data.length > 0 ? (
           <div className="w-full flex justify-center items-center pt-60">
@@ -101,87 +135,42 @@ export default function Slider() {
                 <div className="grid grid-cols-4 gap-5 px-0">
                   {currenData?.map((item: any, index: any) => {
                     return (
-                      <div key={index} className="relative group w-full h-52">
-                        <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
+                      <div key={index} className="relative group w-full h-full">
                         <div className="cursor-pointer absolute top-[40%] left-[33%] hidden group-hover:flex z-10 transform duration-200">
                           <ModalDeleteSlider data={item} image={item.image} />
                         </div>
                         <div className="cursor-pointer absolute top-[40%] right-[33%] hidden group-hover:flex z-10 transform duration-200">
                           <ModalUpdateSlider data={item} />
                         </div>
-                        <Image
-                          src={item?.image}
-                          alt=""
-                          width={1000}
-                          height={1000}
-                          className="w-full h-full object-cover rounded-md"
-                        />
+                        <div>
+                          <div className="w-full h-52 relative overflow-hidden rounded-md">
+                            <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
+                            <Image
+                              src={item?.image}
+                              alt=""
+                              width={1000}
+                              height={1000}
+                              className="w-full h-full object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="mt-1">
+                            {/* <p className="text-sm text-black">
+                              {item?.order_index}
+                            </p> */}
+                            <p className="text-sm text-black">
+                              {item?.description
+                                ? item?.description
+                                : "<<Không có mô tả>>"}
+                            </p>
+                            <p className="text-sm text-black">
+                              {item?.event_time}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
-                <ul className="inline-flex items-stretch -space-x-px">
-                  <li>
-                    <button
-                      onClick={prevPage}
-                      disabled={currenPage === 1}
-                      className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <svg
-                        className="w-5 h-5"
-                        aria-hidden="true"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPage }, (_, i) => i + 1)?.map(
-                    (item: any, index: any) => {
-                      return (
-                        <li key={index} onClick={() => selectPage(item)}>
-                          <a
-                            href="#"
-                            className={`${
-                              item === currenPage ? "bg-orange-100" : "bg-white"
-                            } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-                          >
-                            {item}
-                          </a>
-                        </li>
-                      );
-                    }
-                  )}
-                  <li>
-                    <button
-                      onClick={nextPage}
-                      disabled={currenPage === totalPage}
-                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Next</span>
-                      <svg
-                        className="w-5 h-5"
-                        aria-hidden="true"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                </ul>
               </div>
             ) : (
               <div className="mt-40">

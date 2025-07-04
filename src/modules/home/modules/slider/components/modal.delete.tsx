@@ -31,16 +31,23 @@ export function ModalDeleteSlider({
   const [description, setDescription] = useState<string>(
     data.description || ""
   );
-  const [eventTime, setEventTime] = useState<string>(data.event_time || "");
+
+  const currentDate = new Date();
+  const [eventTime, setEventTime] = useState<string>(
+    data?.event_time || currentDate.toISOString().split("T")[0]
+  );
 
   useEffect(() => {
-    setMainPreview(image || null);
-  }, [image]);
+    setMainPreview(data?.image || null);
+    setDescription(data?.description || "");
+    setEventTime(data?.event_time || "");
+  }, [data]);
 
   const handleDelete = async () => {
     setIsLoading(true);
 
-    await SliderService.deleteSlider(data);
+    await SliderService.deleteSlider(data._id);
+
     setIsLoading(false);
 
     window.location.href = "/?tab=slider";

@@ -31,6 +31,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
   const [description, setDescription] = useState<string>(
     data?.description || ""
   );
+  const [order, setOrder] = useState<number>(data?.order_index || 0);
   const currentDate = new Date();
   const [eventTime, setEventTime] = useState<string>(
     data?.event_time || currentDate.toISOString().split("T")[0]
@@ -89,6 +90,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
         image: imageUrl,
         description: description,
         event_time: eventTime,
+        order_index: order,
       };
 
       const res = await SliderService.updateSlider(data?._id, body);
@@ -113,7 +115,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
   useEffect(() => {
     setMainPreview(data?.image || null);
     setDescription(data?.description || "");
-    setEventTime(data?.eventTime || "");
+    setEventTime(data?.event_time || "");
   }, [data]);
 
   return (
@@ -206,6 +208,20 @@ export function ModalUpdateSlider({ data }: { data: any }) {
                 ></textarea>
               </div>
             </div>{" "}
+            {/* <div className="flex flex-col justify-start items-start gap-2 z-40">
+              <Label htmlFor="description" className="text-[16px]">
+                Thứ tự
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <textarea
+                  id="order"
+                  value={order}
+                  onChange={(e) => setOrder(Number(e.target.value))}
+                  placeholder="Thứ tự"
+                  className="col-span-3 p-2 border rounded"
+                ></textarea>
+              </div>
+            </div>{" "} */}
             <div className="relative flex flex-col justify-start items-start gap-2 mt-4">
               <Label htmlFor="event-time" className="text-[16px]">
                 Thời gian sự kiện
@@ -215,9 +231,7 @@ export function ModalUpdateSlider({ data }: { data: any }) {
                   type="date"
                   id="event-time"
                   value={eventTime}
-                  onChange={(e) => {
-                    setEventTime(e.target.value);
-                  }}
+                  onChange={(e) => setEventTime(e.target.value)}
                   placeholder="Thời gian sự kiện"
                   className="col-span-3 p-2 border rounded"
                 />

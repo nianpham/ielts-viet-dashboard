@@ -21,7 +21,7 @@ import "@/styles/hide-scroll.css";
 import { SliderService } from "@/services/sliders";
 import "@/styles/hide-scroll.css";
 
-export function ModalCreateSlider() {
+export function ModalCreateSlider({ dataLength }: { dataLength: number }) {
   const { toast } = useToast();
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -79,6 +79,7 @@ export function ModalCreateSlider() {
       image: uploadMainImage[0]?.url || "",
       description: description,
       event_time: eventTime,
+      order_index: dataLength + 1,
     };
     await SliderService.createSlider(body);
     setIsLoading(false);
