@@ -48,7 +48,9 @@ export default function Slider() {
   useEffect(() => {}, [totalPage, isLoading, currenData, currenPage, data]);
 
   const handleSortByDate = async (direction: "asc" | "desc") => {
-    if (!currenData || currenData.length === 0) return;
+    console.log("Sorting by date:", direction);
+
+    // if (!currenData || currenData.length === 0) return;
     const sorted = [...currenData].sort((a, b) => {
       const dateA = new Date(a.event_time).getTime();
       const dateB = new Date(b.event_time).getTime();
@@ -106,7 +108,11 @@ export default function Slider() {
             type="button"
           >
             Sắp xếp ngày{" "}
-            {isSortingUp ? <Loader className="animate-spin" size={16} /> : "↑"}
+            {isSortingUp ? (
+              <Loader className="animate-spin" size={16} />
+            ) : (
+              "cũ nhất"
+            )}
           </button>
           <button
             className="ml-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm flex items-center gap-2"
@@ -117,7 +123,7 @@ export default function Slider() {
             {isSortingDown ? (
               <Loader className="animate-spin" size={16} />
             ) : (
-              "↓"
+              "mới nhất"
             )}
           </button>
         </div>

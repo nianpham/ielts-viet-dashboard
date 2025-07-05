@@ -21,7 +21,13 @@ import "@/styles/hide-scroll.css";
 import { SliderService } from "@/services/sliders";
 import "@/styles/hide-scroll.css";
 
-export function ModalCreateSlider({ dataLength }: { dataLength: number }) {
+export function ModalCreateSlider({
+  dataLength,
+  onRefresh,
+}: {
+  dataLength: number;
+  onRefresh?: () => Promise<void>;
+}) {
   const { toast } = useToast();
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -71,20 +77,36 @@ export function ModalCreateSlider({ dataLength }: { dataLength: number }) {
     if (!validateForm()) return;
     setIsLoading(true);
 
-    const uploadMainImage: any = await UploadService.uploadToCloudinary([
-      mainPreview,
-    ]);
+    try {
+      const uploadMainImage: any = await UploadService.uploadToCloudinary([
+        mainPreview,
+      ]);
 
-    const body = {
-      image: uploadMainImage[0]?.url || "",
-      description: description,
-      event_time: eventTime,
-      order_index: dataLength + 1,
-    };
-    await SliderService.createSlider(body);
-    setIsLoading(false);
+      const body = {
+        image: uploadMainImage[0]?.url || "",
+        description: description,
+        event_time: eventTime,
+        order_index: dataLength + 1,
+      };
+      await SliderService.createSlider(body);
+      setIsLoading(false);
 
-    window.location.href = "/?tab=slider";
+      window.location.href = "/?tab=slider";
+
+      toast({
+        title: "Thành công",
+        description: "Đã thêm hình ảnh mới vào slider.",
+      });
+    } catch (error) {
+      console.error("Error creating slider:", error);
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Không thể thêm hình ảnh. Vui lòng thử lại.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
